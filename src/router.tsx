@@ -1,6 +1,6 @@
-import { Layout } from '@/components/Layout';
-import { Home } from '@/pages/Home';
-import { ReadabilityTool } from '@/pages/tools/Readability';
+import { Layout } from '@/components/layout';
+import { Home } from '@/pages/home';
+import { ReadabilityTool } from '@/pages/tools/readability';
 import {
   createRootRoute,
   createRoute,
