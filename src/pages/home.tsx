@@ -5,14 +5,17 @@ import { useState } from 'react';
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
 
-  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+    'gi'
+  );
   const parts = text.split(regex);
 
   return (
     <>
       {parts.map((part, i) =>
         regex.test(part) ? (
-          <mark key={i} className="bg-yellow-200 dark:bg-yellow-800 rounded-sm">
+          <mark key={i} className='rounded-sm bg-yellow-200 dark:bg-yellow-800'>
             {part}
           </mark>
         ) : (
