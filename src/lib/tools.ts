@@ -7,9 +7,9 @@ export interface Tool {
 
 export const tools: Tool[] = [
   {
-    id: 'hello-world',
-    name: 'Hello World',
-    description: 'A simple hello world tool to get started',
-    path: '/tools/hello-world',
+    id: 'readability',
+    name: 'Readability',
+    description: 'Extract and preview clean article content from any URL',
+    path: '/tools/readability',
   },
 ];

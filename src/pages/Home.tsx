@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
 import { tools } from '@/lib/tools';
+import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
 
 export function Home() {
   const [search, setSearch] = useState('');
@@ -12,33 +12,37 @@ export function Home() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className='space-y-6'>
       <div>
-        <h1 className="text-2xl font-bold mb-2">Tools</h1>
-        <p className="text-muted-foreground">Browse and search through available tools.</p>
+        <h1 className='mb-2 text-2xl font-bold'>Tools</h1>
+        <p className='text-muted-foreground'>
+          Browse and search through available tools.
+        </p>
       </div>
 
       <input
-        type="text"
-        placeholder="Search tools..."
+        type='text'
+        placeholder='Search tools...'
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="w-full max-w-md px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+        className='border-border bg-background focus:ring-ring w-full max-w-md rounded-md border px-3 py-2 focus:ring-2 focus:outline-none'
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {filteredTools.map((tool) => (
           <Link
             key={tool.id}
             to={tool.path}
-            className="block p-4 border border-border rounded-lg hover:border-primary hover:bg-accent transition-colors"
+            className='border-border hover:border-primary hover:bg-accent block rounded-lg border p-4 transition-colors'
           >
-            <h2 className="font-semibold mb-1">{tool.name}</h2>
-            <p className="text-sm text-muted-foreground">{tool.description}</p>
+            <h2 className='mb-1 font-semibold'>{tool.name}</h2>
+            <p className='text-muted-foreground text-sm'>{tool.description}</p>
           </Link>
         ))}
         {filteredTools.length === 0 && (
-          <p className="text-muted-foreground col-span-full">No tools found matching "{search}"</p>
+          <p className='text-muted-foreground col-span-full'>
+            No tools found matching "{search}"
+          </p>
         )}
       </div>
     </div>

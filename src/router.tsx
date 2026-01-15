@@ -1,7 +1,11 @@
-import { createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
 import { Layout } from '@/components/Layout';
 import { Home } from '@/pages/Home';
-import { HelloWorld } from '@/pages/tools/HelloWorld';
+import { ReadabilityTool } from '@/pages/tools/Readability';
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+} from '@tanstack/react-router';
 
 const rootRoute = createRootRoute({
   component: Layout,
@@ -13,13 +17,13 @@ const indexRoute = createRoute({
   component: Home,
 });
 
-const helloWorldRoute = createRoute({
+const readabilityRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/hello-world',
-  component: HelloWorld,
+  path: '/tools/readability',
+  component: ReadabilityTool,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, helloWorldRoute]);
+const routeTree = rootRoute.addChildren([indexRoute, readabilityRoute]);
 
 export const router = createRouter({ routeTree });
 
