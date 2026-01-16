@@ -24,4 +24,10 @@ export const tools: Tool[] = [
     description: 'Stay focused with customizable work and break intervals',
     path: '/tools/pomodoro-timer',
   },
+  {
+    id: 'diff-viewer',
+    name: 'Diff Viewer',
+    description: 'Render and visualize diffs from pasted patches with customizable display options',
+    path: '/tools/diff-viewer',
+  },
 ];
