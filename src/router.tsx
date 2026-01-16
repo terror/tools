@@ -1,5 +1,6 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
+import { DiffViewerTool } from '@/pages/tools/diff-viewer';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
 import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
@@ -37,11 +38,18 @@ const pomodoroTimerRoute = createRoute({
   component: PomodoroTimerTool,
 });
 
+const diffViewerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/diff-viewer',
+  component: DiffViewerTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
   mathRendererRoute,
   pomodoroTimerRoute,
+  diffViewerRoute,
 ]);
 
 export const router = createRouter({ routeTree });
