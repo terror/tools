@@ -8,4 +8,5 @@ A suite of web-based tools hosted at [tools.liam.rs](https://tools.liam.rs/).
 
 ## Prior Art
 
-This site was inspired by [tools.simonwillison.net](https://tools.simonwillison.net/).
+This site was inspired by
+[tools.simonwillison.net](https://tools.simonwillison.net/).
