@@ -82,6 +82,7 @@ function getCodePoints(text: string): string[] {
       result.push(`U+${codePoint.toString(16).toUpperCase().padStart(4, '0')}`);
     }
   }
+
   return result;
 }
 
