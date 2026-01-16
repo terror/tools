@@ -18,4 +18,10 @@ export const tools: Tool[] = [
     description: 'Render LaTeX math expressions using KaTeX',
     path: '/tools/math-renderer',
   },
+  {
+    id: 'pomodoro-timer',
+    name: 'Pomodoro Timer',
+    description: 'Stay focused with customizable work and break intervals',
+    path: '/tools/pomodoro-timer',
+  },
 ];
