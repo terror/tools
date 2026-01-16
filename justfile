@@ -21,7 +21,7 @@ fmt:
 
 [group: 'check']
 fmt-check:
-  prettier --check .
+  bun run format-check
 
 [group: 'check']
 lint:
