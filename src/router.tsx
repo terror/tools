@@ -1,6 +1,7 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
+import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
 import {
   createRootRoute,
@@ -30,10 +31,17 @@ const mathRendererRoute = createRoute({
   component: MathRendererTool,
 });
 
+const pomodoroTimerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/pomodoro-timer',
+  component: PomodoroTimerTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
   mathRendererRoute,
+  pomodoroTimerRoute,
 ]);
 
 export const router = createRouter({ routeTree });
