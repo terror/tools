@@ -18,4 +18,10 @@ export const tools: Tool[] = [
     description: 'Render LaTeX math expressions using KaTeX',
     path: '/tools/math-renderer',
   },
+  {
+    id: 'markdown-preview',
+    name: 'Markdown Preview',
+    description: 'Preview markdown with live rendering',
+    path: '/tools/markdown-preview',
+  },
 ];
