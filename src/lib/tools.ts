@@ -37,4 +37,11 @@ export const tools: Tool[] = [
     description: 'Count words and analyze text statistics',
     path: '/tools/word-counter',
   },
+  {
+    id: 'emoji-smuggler',
+    name: 'Emoji Smuggler',
+    description:
+      'Hide and reveal secret messages in emoji using Unicode variation selectors',
+    path: '/tools/emoji-smuggler',
+  },
 ];
