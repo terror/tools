@@ -27,7 +27,8 @@ export const tools: Tool[] = [
   {
     id: 'diff-viewer',
     name: 'Diff Viewer',
-    description: 'Render and visualize diffs from pasted patches with customizable display options',
+    description:
+      'Render and visualize diffs from pasted patches with customizable display options',
     path: '/tools/diff-viewer',
   },
 ];

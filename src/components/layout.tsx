@@ -1,4 +1,5 @@
 import { ModeToggle } from '@/components/mode-toggle';
+import { Toaster } from '@/components/ui/sonner';
 import { Link, Outlet } from '@tanstack/react-router';
 import { Hammer } from 'lucide-react';
 
@@ -16,6 +17,7 @@ export function Layout() {
       <main className='container mx-auto px-4 py-6'>
         <Outlet />
       </main>
+      <Toaster />
     </div>
   );
 }

@@ -19,12 +19,32 @@ import {
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from '@/providers/theme-provider';
-import { parsePatchFiles, type FileDiffMetadata } from '@pierre/diffs';
+import { type FileDiffMetadata, parsePatchFiles } from '@pierre/diffs';
 import { FileDiff } from '@pierre/diffs/react';
 import { Loader2, Settings } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
 
-const GITHUB_PR_REGEX = /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
+const GITHUB_PR_REGEX =
+  /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
+
+function parseShortPrParam(
+  param: string
+): { owner: string; repo: string; prNumber: string } | null {
+  const match = param.match(/^(.+)-(\d+)$/);
+  if (!match) return null;
+
+  const [, ownerRepo, prNumber] = match;
+  const lastDashIndex = ownerRepo.lastIndexOf('-');
+  if (lastDashIndex === -1) return null;
+
+  const owner = ownerRepo.slice(0, lastDashIndex);
+  const repo = ownerRepo.slice(lastDashIndex + 1);
+
+  if (!owner || !repo) return null;
+
+  return { owner, repo, prNumber };
+}
 
 type DiffStyle = 'split' | 'unified';
 type DiffIndicators = 'bars' | 'classic' | 'none';
@@ -58,7 +78,7 @@ function loadConfig(): DiffConfig {
       return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
     }
   } catch {
-    // Ignore parse errors
+    // ignore
   }
   return DEFAULT_CONFIG;
 }
@@ -96,62 +116,86 @@ export function DiffViewerTool() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
   }, [config]);
 
-  const fetchPatch = useCallback(async (url: string) => {
-    const match = url.match(GITHUB_PR_REGEX);
-    if (!match) {
-      setError('Invalid GitHub PR URL. Expected format: https://github.com/owner/repo/pull/123');
-      return;
-    }
+  const fetchPatch = useCallback(
+    async (owner: string, repo: string, prNumber: string) => {
+      const canonicalUrl = `https://github.com/${owner}/${repo}/pull/${prNumber}`;
+      const patchUrl = `${canonicalUrl}.patch`;
+      const shortParam = `${owner}-${repo}-${prNumber}`;
 
-    const [, owner, repo, prNumber] = match;
-    const canonicalUrl = `https://github.com/${owner}/${repo}/pull/${prNumber}`;
-    const patchUrl = `${canonicalUrl}.patch`;
+      setLoading(true);
+      setError(null);
 
-    setLoading(true);
-    setError(null);
+      try {
+        const response = await fetch(
+          `https://api.allorigins.win/raw?url=${encodeURIComponent(patchUrl)}`
+        );
 
-    try {
-      const response = await fetch(
-        `https://api.allorigins.win/raw?url=${encodeURIComponent(patchUrl)}`
-      );
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch patch: ${response.status} ${response.statusText}`
+          );
+        }
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch patch: ${response.status} ${response.statusText}`);
+        const patchContent = await response.text();
+
+        if (!patchContent.trim()) {
+          throw new Error(
+            'No diff content found. The PR may have no file changes.'
+          );
+        }
+
+        setPatch(patchContent);
+        setPrUrl('');
+        setCurrentGitHubUrl(canonicalUrl);
+
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('q', shortParam);
+        window.history.replaceState({}, '', newUrl.toString());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to fetch patch');
+      } finally {
+        setLoading(false);
       }
+    },
+    []
+  );
 
-      const patchContent = await response.text();
-
-      if (!patchContent.trim()) {
-        throw new Error('No diff content found. The PR may have no file changes.');
+  const fetchFromUrl = useCallback(
+    (url: string) => {
+      const match = url.match(GITHUB_PR_REGEX);
+      if (!match) {
+        setError(
+          'Invalid GitHub PR URL. Expected format: https://github.com/owner/repo/pull/123'
+        );
+        return;
       }
+      const [, owner, repo, prNumber] = match;
+      fetchPatch(owner, repo, prNumber);
+    },
+    [fetchPatch]
+  );
 
-      setPatch(patchContent);
-      setPrUrl('');
-      setCurrentGitHubUrl(canonicalUrl);
-
-      // Update URL with q parameter
-      const newUrl = new URL(window.location.href);
-      newUrl.searchParams.set('q', canonicalUrl);
-      window.history.replaceState({}, '', newUrl.toString());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch patch');
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Load from URL parameter on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlParam = params.get('q');
-    if (urlParam && GITHUB_PR_REGEX.test(urlParam)) {
-      fetchPatch(urlParam);
+    if (!urlParam) return;
+
+    const fullMatch = urlParam.match(GITHUB_PR_REGEX);
+    if (fullMatch) {
+      const [, owner, repo, prNumber] = fullMatch;
+      fetchPatch(owner, repo, prNumber);
+      return;
+    }
+
+    const shortParsed = parseShortPrParam(urlParam);
+    if (shortParsed) {
+      fetchPatch(shortParsed.owner, shortParsed.repo, shortParsed.prNumber);
     }
   }, [fetchPatch]);
 
   const fetchPrPatch = () => {
     if (prUrl.trim()) {
-      fetchPatch(prUrl.trim());
+      fetchFromUrl(prUrl.trim());
     }
   };
 
@@ -232,7 +276,6 @@ export function DiffViewerTool() {
             value={patch}
             onChange={(e) => {
               setPatch(e.target.value);
-              // Clear GitHub URL state and URL param when manually editing
               if (currentGitHubUrl) {
                 setCurrentGitHubUrl(null);
                 const newUrl = new URL(window.location.href);
@@ -251,14 +294,14 @@ export function DiffViewerTool() {
         </div>
 
         {currentGitHubUrl && (
-          <div className='flex items-center justify-between rounded-lg border bg-muted/50 px-4 py-3'>
+          <div className='bg-muted/50 flex items-center justify-between rounded-lg border px-4 py-3'>
             <div className='flex items-center gap-2 text-sm'>
               <span className='text-muted-foreground'>Viewing:</span>
               <a
                 href={currentGitHubUrl}
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-medium text-primary hover:underline'
+                className='text-primary font-medium hover:underline'
               >
                 {currentGitHubUrl.replace('https://github.com/', '')}
               </a>
@@ -268,6 +311,7 @@ export function DiffViewerTool() {
               size='sm'
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
+                toast.success('Copied to clipboard');
               }}
             >
               Copy Link
@@ -394,7 +438,11 @@ export function DiffViewerTool() {
                 </div>
               </div>
 
-              <Button variant='secondary' onClick={resetConfig} className='w-full'>
+              <Button
+                variant='secondary'
+                onClick={resetConfig}
+                className='w-full'
+              >
                 Reset to Defaults
               </Button>
             </DialogContent>
@@ -415,7 +463,10 @@ export function DiffViewerTool() {
         >
           {fileDiffs.length > 0 ? (
             fileDiffs.map((fileDiff, index) => (
-              <div key={`${fileDiff.name}-${index}`} className='overflow-hidden rounded-lg border'>
+              <div
+                key={`${fileDiff.name}-${index}`}
+                className='overflow-hidden rounded-lg border'
+              >
                 <FileDiff
                   fileDiff={fileDiff}
                   options={{
