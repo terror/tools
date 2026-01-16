@@ -1,4 +1,5 @@
 import { Tool } from '@/components/tool';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,6 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Settings } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -171,17 +173,13 @@ export function PomodoroTimerTool() {
       <div className='flex max-w-md flex-col items-center space-y-8'>
         <div className='flex gap-2'>
           {(Object.keys(MODE_LABELS) as TimerMode[]).map((m) => (
-            <button
+            <Button
               key={m}
               onClick={() => switchMode(m)}
-              className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-                mode === m
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-accent hover:bg-accent/80'
-              }`}
+              variant={mode === m ? 'default' : 'secondary'}
             >
               {MODE_LABELS[m]}
-            </button>
+            </Button>
           ))}
         </div>
 
@@ -227,22 +225,23 @@ export function PomodoroTimerTool() {
         </div>
 
         <div className='flex gap-4'>
-          <button
+          <Button
             onClick={toggleTimer}
-            className={`rounded-full px-8 py-3 text-lg font-semibold transition-colors ${
-              isRunning
-                ? 'bg-orange-500 text-white hover:bg-orange-600'
-                : 'bg-primary text-primary-foreground hover:bg-primary/90'
+            size='lg'
+            className={`rounded-full px-8 ${
+              isRunning ? 'bg-orange-500 hover:bg-orange-600' : ''
             }`}
           >
             {isRunning ? 'Pause' : 'Start'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={resetTimer}
-            className='bg-accent hover:bg-accent/80 rounded-full px-6 py-3 text-lg font-semibold transition-colors'
+            variant='secondary'
+            size='lg'
+            className='rounded-full px-6'
           >
             Reset
-          </button>
+          </Button>
         </div>
 
         <div className='flex items-center gap-3'>
@@ -270,10 +269,10 @@ export function PomodoroTimerTool() {
 
         <Dialog open={showSettings} onOpenChange={setShowSettings}>
           <DialogTrigger asChild>
-            <button className='text-muted-foreground hover:text-foreground flex cursor-pointer items-center gap-2 text-sm transition-colors'>
+            <Button variant='ghost' size='sm'>
               <Settings className='h-4 w-4' />
               Settings
-            </button>
+            </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
@@ -287,7 +286,7 @@ export function PomodoroTimerTool() {
               <div className='flex items-center justify-between'>
                 <label className='text-sm font-medium'>Focus Duration</label>
                 <div className='flex items-center gap-2'>
-                  <input
+                  <Input
                     type='number'
                     min='1'
                     max='60'
@@ -295,7 +294,7 @@ export function PomodoroTimerTool() {
                     onChange={(e) =>
                       updateConfig('work', parseInt(e.target.value) || 1)
                     }
-                    className='border-border bg-background w-16 rounded border px-2 py-1 text-center text-sm'
+                    className='w-16 text-center'
                   />
                   <span className='text-muted-foreground text-sm'>min</span>
                 </div>
@@ -304,7 +303,7 @@ export function PomodoroTimerTool() {
               <div className='flex items-center justify-between'>
                 <label className='text-sm font-medium'>Short Break</label>
                 <div className='flex items-center gap-2'>
-                  <input
+                  <Input
                     type='number'
                     min='1'
                     max='30'
@@ -312,7 +311,7 @@ export function PomodoroTimerTool() {
                     onChange={(e) =>
                       updateConfig('shortBreak', parseInt(e.target.value) || 1)
                     }
-                    className='border-border bg-background w-16 rounded border px-2 py-1 text-center text-sm'
+                    className='w-16 text-center'
                   />
                   <span className='text-muted-foreground text-sm'>min</span>
                 </div>
@@ -321,7 +320,7 @@ export function PomodoroTimerTool() {
               <div className='flex items-center justify-between'>
                 <label className='text-sm font-medium'>Long Break</label>
                 <div className='flex items-center gap-2'>
-                  <input
+                  <Input
                     type='number'
                     min='1'
                     max='60'
@@ -329,7 +328,7 @@ export function PomodoroTimerTool() {
                     onChange={(e) =>
                       updateConfig('longBreak', parseInt(e.target.value) || 1)
                     }
-                    className='border-border bg-background w-16 rounded border px-2 py-1 text-center text-sm'
+                    className='w-16 text-center'
                   />
                   <span className='text-muted-foreground text-sm'>min</span>
                 </div>
@@ -339,7 +338,7 @@ export function PomodoroTimerTool() {
                 <label className='text-sm font-medium'>
                   Sessions before long break
                 </label>
-                <input
+                <Input
                   type='number'
                   min='2'
                   max='10'
@@ -350,17 +349,14 @@ export function PomodoroTimerTool() {
                       parseInt(e.target.value) || 4
                     )
                   }
-                  className='border-border bg-background w-16 rounded border px-2 py-1 text-center text-sm'
+                  className='w-16 text-center'
                 />
               </div>
             </div>
 
-            <button
-              onClick={resetAll}
-              className='bg-destructive text-destructive-foreground hover:bg-destructive/90 w-full rounded px-4 py-2 text-sm font-medium'
-            >
+            <Button onClick={resetAll} variant='destructive' className='w-full'>
               Reset
-            </button>
+            </Button>
           </DialogContent>
         </Dialog>
       </div>
