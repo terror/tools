@@ -369,7 +369,7 @@ export function DiffViewerTool() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Display Settings</DialogTitle>
+                <DialogTitle>Settings</DialogTitle>
                 <DialogDescription>
                   Customize how diffs are rendered.
                 </DialogDescription>
@@ -483,7 +483,7 @@ export function DiffViewerTool() {
                 onClick={resetConfig}
                 className='w-full'
               >
-                Reset to Defaults
+                Reset
               </Button>
             </DialogContent>
           </Dialog>
