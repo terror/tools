@@ -28,6 +28,12 @@ import { toast } from 'sonner';
 const GITHUB_PR_REGEX =
   /^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/pull\/(\d+)/;
 
+const EXAMPLE_PRS = [
+  { owner: 'astral-sh', repo: 'uv', prNumber: '16854' },
+  { owner: 'facebook', repo: 'pyrefly', prNumber: '1752' },
+  { owner: 'rust-lang', repo: 'cargo', prNumber: '16490' },
+];
+
 function parseShortPrParam(
   param: string
 ): { owner: string; repo: string; prNumber: string } | null {
@@ -286,6 +292,21 @@ export function DiffViewerTool() {
                 'Fetch'
               )}
             </Button>
+          </div>
+          <div className='flex flex-wrap items-center gap-2'>
+            <span className='text-muted-foreground text-xs'>Examples:</span>
+            {EXAMPLE_PRS.map((pr) => (
+              <Button
+                key={`${pr.owner}-${pr.repo}-${pr.prNumber}`}
+                variant='outline'
+                size='sm'
+                className='h-6 px-2 text-xs'
+                disabled={loading}
+                onClick={() => fetchPatch(pr.owner, pr.repo, pr.prNumber)}
+              >
+                {pr.owner}/{pr.repo}#{pr.prNumber}
+              </Button>
+            ))}
           </div>
         </div>
 
