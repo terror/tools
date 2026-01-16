@@ -1,6 +1,30 @@
-import { tools } from '@/lib/tools';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Tool, tools } from '@/lib/tools';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
+
+type SortOption = 'alphabetical' | 'alphabetical-desc' | 'newest' | 'oldest';
+
+function sortTools(toolList: Tool[], sortBy: SortOption): Tool[] {
+  return [...toolList].sort((a, b) => {
+    switch (sortBy) {
+      case 'alphabetical':
+        return a.name.localeCompare(b.name);
+      case 'alphabetical-desc':
+        return b.name.localeCompare(a.name);
+      case 'newest':
+        return b.createdAt.localeCompare(a.createdAt);
+      case 'oldest':
+        return a.createdAt.localeCompare(b.createdAt);
+    }
+  });
+}
 
 function Highlight({ text, query }: { text: string; query: string }) {
   if (!query.trim()) return <>{text}</>;
@@ -9,6 +33,7 @@ function Highlight({ text, query }: { text: string; query: string }) {
     `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
     'gi'
   );
+
   const parts = text.split(regex);
 
   return (
@@ -26,13 +51,41 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
+const SORT_STORAGE_KEY = 'tools-sort-preference';
+
+function getInitialSort(): SortOption {
+  if (typeof window === 'undefined') return 'newest';
+
+  const stored = localStorage.getItem(SORT_STORAGE_KEY);
+
+  if (
+    stored === 'alphabetical' ||
+    stored === 'alphabetical-desc' ||
+    stored === 'newest' ||
+    stored === 'oldest'
+  ) {
+    return stored;
+  }
+
+  return 'newest';
+}
+
 export function Home() {
   const [search, setSearch] = useState('');
+  const [sortBy, setSortBy] = useState<SortOption>(getInitialSort);
 
-  const filteredTools = tools.filter(
-    (tool) =>
-      tool.name.toLowerCase().includes(search.toLowerCase()) ||
-      tool.description.toLowerCase().includes(search.toLowerCase())
+  function handleSortChange(value: SortOption) {
+    setSortBy(value);
+    localStorage.setItem(SORT_STORAGE_KEY, value);
+  }
+
+  const filteredTools = sortTools(
+    tools.filter(
+      (tool) =>
+        tool.name.toLowerCase().includes(search.toLowerCase()) ||
+        tool.description.toLowerCase().includes(search.toLowerCase())
+    ),
+    sortBy
   );
 
   return (
@@ -44,13 +97,29 @@ export function Home() {
         </p>
       </div>
 
-      <input
-        type='text'
-        placeholder='Search tools...'
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-        className='border-border bg-background focus:ring-ring w-full max-w-md rounded-md border px-3 py-2 focus:ring-2 focus:outline-none'
-      />
+      <div className='flex flex-wrap gap-3'>
+        <input
+          type='text'
+          placeholder='Search tools...'
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className='border-border bg-background focus:ring-ring w-full max-w-md rounded-md border px-3 py-2 focus:ring-2 focus:outline-none'
+        />
+        <Select
+          value={sortBy}
+          onValueChange={(v) => handleSortChange(v as SortOption)}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='newest'>Newest</SelectItem>
+            <SelectItem value='oldest'>Oldest</SelectItem>
+            <SelectItem value='alphabetical'>A-Z</SelectItem>
+            <SelectItem value='alphabetical-desc'>Z-A</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
 
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
         {filteredTools.map((tool) => (
