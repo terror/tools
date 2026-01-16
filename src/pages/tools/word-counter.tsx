@@ -1,7 +1,7 @@
 import { Tool } from '@/components/tool';
 import { Textarea } from '@/components/ui/textarea';
-import { useState, useMemo } from 'react';
-import { FileText, Clock, TrendingUp, Hash } from 'lucide-react';
+import { Clock, FileText, Hash, TrendingUp } from 'lucide-react';
+import { useMemo, useState } from 'react';
 
 interface TextStats {
   words: number;
@@ -36,16 +36,17 @@ function calculateStats(text: string): TextStats {
     .filter((word) => word.length > 0);
   const characters = text.length;
   const charactersNoSpaces = text.replace(/\s/g, '').length;
-  const sentences = text.split(/[.!?]+/).filter((s) => s.trim().length > 0)
-    .length;
-  const paragraphs = text.split(/\n\s*\n/).filter((p) => p.trim().length > 0)
-    .length;
+  const sentences = text
+    .split(/[.!?]+/)
+    .filter((s) => s.trim().length > 0).length;
+  const paragraphs = text
+    .split(/\n\s*\n/)
+    .filter((p) => p.trim().length > 0).length;
 
   const totalWordLength = words.reduce((sum, word) => sum + word.length, 0);
   const averageWordLength =
     words.length > 0 ? totalWordLength / words.length : 0;
-  const averageSentenceLength =
-    sentences > 0 ? words.length / sentences : 0;
+  const averageSentenceLength = sentences > 0 ? words.length / sentences : 0;
 
   const readingTimeMinutes = words.length / 225;
 
@@ -115,7 +116,7 @@ export function WordCounterTool() {
             placeholder='Start typing or paste your text here...'
             value={text}
             onChange={(e) => setText(e.target.value)}
-            className='border-border bg-background min-h-[200px] w-full rounded-md border px-3 py-2 focus:ring-2 focus:ring-ring focus:outline-none'
+            className='border-border bg-background focus:ring-ring min-h-[200px] w-full rounded-md border px-3 py-2 focus:ring-2 focus:outline-none'
           />
         </div>
 
