@@ -32,16 +32,25 @@ function parseShortPrParam(
   param: string
 ): { owner: string; repo: string; prNumber: string } | null {
   const match = param.match(/^(.+)-(\d+)$/);
-  if (!match) return null;
+
+  if (!match) {
+    return null;
+  }
 
   const [, ownerRepo, prNumber] = match;
+
   const lastDashIndex = ownerRepo.lastIndexOf('-');
-  if (lastDashIndex === -1) return null;
+
+  if (lastDashIndex === -1) {
+    return null;
+  }
 
   const owner = ownerRepo.slice(0, lastDashIndex);
   const repo = ownerRepo.slice(lastDashIndex + 1);
 
-  if (!owner || !repo) return null;
+  if (!owner || !repo) {
+    return null;
+  }
 
   return { owner, repo, prNumber };
 }
@@ -74,12 +83,14 @@ const STORAGE_KEY = 'diff-viewer-config';
 function loadConfig(): DiffConfig {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
+
     if (stored) {
       return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
     }
   } catch {
     // ignore
   }
+
   return DEFAULT_CONFIG;
 }
 
@@ -103,14 +114,15 @@ index abc123..def456 100644
 `;
 
 export function DiffViewerTool() {
+  const { theme } = useTheme();
+
+  const [config, setConfig] = useState<DiffConfig>(loadConfig);
+  const [currentGitHubUrl, setCurrentGitHubUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [patch, setPatch] = useState('');
   const [prUrl, setPrUrl] = useState('');
-  const [currentGitHubUrl, setCurrentGitHubUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [config, setConfig] = useState<DiffConfig>(loadConfig);
   const [showSettings, setShowSettings] = useState(false);
-  const { theme } = useTheme();
 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
@@ -163,13 +175,17 @@ export function DiffViewerTool() {
   const fetchFromUrl = useCallback(
     (url: string) => {
       const match = url.match(GITHUB_PR_REGEX);
+
       if (!match) {
         setError(
           'Invalid GitHub PR URL. Expected format: https://github.com/owner/repo/pull/123'
         );
+
         return;
       }
+
       const [, owner, repo, prNumber] = match;
+
       fetchPatch(owner, repo, prNumber);
     },
     [fetchPatch]
@@ -177,10 +193,15 @@ export function DiffViewerTool() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
+
     const urlParam = params.get('q');
-    if (!urlParam) return;
+
+    if (!urlParam) {
+      return;
+    }
 
     const fullMatch = urlParam.match(GITHUB_PR_REGEX);
+
     if (fullMatch) {
       const [, owner, repo, prNumber] = fullMatch;
       fetchPatch(owner, repo, prNumber);
@@ -188,6 +209,7 @@ export function DiffViewerTool() {
     }
 
     const shortParsed = parseShortPrParam(urlParam);
+
     if (shortParsed) {
       fetchPatch(shortParsed.owner, shortParsed.repo, shortParsed.prNumber);
     }
