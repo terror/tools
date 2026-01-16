@@ -4,6 +4,7 @@ import { DiffViewerTool } from '@/pages/tools/diff-viewer';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
 import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
+import { WordCounterTool } from '@/pages/tools/word-counter';
 import {
   createRootRoute,
   createRoute,
@@ -44,12 +45,19 @@ const diffViewerRoute = createRoute({
   component: DiffViewerTool,
 });
 
+const wordCounterRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/word-counter',
+  component: WordCounterTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
   mathRendererRoute,
   pomodoroTimerRoute,
   diffViewerRoute,
+  wordCounterRoute,
 ]);
 
 export const router = createRouter({ routeTree });

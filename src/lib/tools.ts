@@ -31,4 +31,10 @@ export const tools: Tool[] = [
       'Render and visualize diffs from pasted patches with customizable display options',
     path: '/tools/diff-viewer',
   },
+  {
+    id: 'word-counter',
+    name: 'Word Counter',
+    description: 'Count words and analyze text statistics',
+    path: '/tools/word-counter',
+  },
 ];
