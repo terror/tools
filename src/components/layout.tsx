@@ -8,7 +8,7 @@ export function Layout() {
       <header className='border-border border-b'>
         <div className='container mx-auto flex items-center justify-between px-4 py-3'>
           <Link to='/' className='hover:text-primary text-lg font-semibold'>
-            <Hammer />
+            <Hammer className='h-5 w-5' />
           </Link>
           <ModeToggle />
         </div>
