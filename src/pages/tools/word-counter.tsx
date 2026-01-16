@@ -109,7 +109,7 @@ export function WordCounterTool() {
   const stats = useMemo(() => calculateStats(text), [text]);
 
   return (
-    <Tool toolId='word-counter' error={null}>
+    <Tool toolId='word-counter'>
       <div className='space-y-6'>
         <div>
           <Textarea

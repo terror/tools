@@ -1,6 +1,7 @@
 import { Tool } from '@/components/tool';
 import { Readability } from '@mozilla/readability';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 interface Article {
   title: string;
@@ -14,13 +15,11 @@ export function ReadabilityTool() {
   const [url, setUrl] = useState('');
   const [article, setArticle] = useState<Article | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   async function fetchArticle() {
     if (!url) return;
 
     setLoading(true);
-    setError(null);
     setArticle(null);
 
     try {
@@ -53,14 +52,14 @@ export function ReadabilityTool() {
         siteName: parsed.siteName ?? null,
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Tool toolId='readability' error={error}>
+    <Tool toolId='readability'>
       <div className='flex max-w-2xl gap-2'>
         <input
           type='url'
