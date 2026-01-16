@@ -1,5 +1,5 @@
+import { Tool } from '@/components/tool';
 import { Readability } from '@mozilla/readability';
-import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 interface Article {
@@ -60,24 +60,7 @@ export function ReadabilityTool() {
   }
 
   return (
-    <div className='space-y-6'>
-      <div>
-        <Link
-          to='/'
-          className='text-muted-foreground hover:text-foreground text-sm'
-        >
-          &larr; Back to tools
-        </Link>
-      </div>
-
-      <div>
-        <h1 className='mb-2 text-2xl font-bold'>Readability</h1>
-        <p className='text-muted-foreground'>
-          Extract and preview article content from any URL using Mozilla's
-          Readability.
-        </p>
-      </div>
-
+    <Tool toolId='readability' error={error}>
       <div className='flex max-w-2xl gap-2'>
         <input
           type='url'
@@ -95,12 +78,6 @@ export function ReadabilityTool() {
           {loading ? 'Loading...' : 'Extract'}
         </button>
       </div>
-
-      {error && (
-        <div className='border-destructive/50 bg-destructive/10 text-destructive rounded-lg border p-4'>
-          {error}
-        </div>
-      )}
 
       {article && (
         <article className='border-border max-w-2xl overflow-hidden rounded-lg border'>
@@ -125,6 +102,6 @@ export function ReadabilityTool() {
           />
         </article>
       )}
-    </div>
+    </Tool>
   );
 }

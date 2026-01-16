@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Tool } from '@/components/tool';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { useMemo, useState } from 'react';
@@ -35,24 +35,7 @@ export function MathRendererTool() {
   }, [input, displayMode]);
 
   return (
-    <div className='space-y-6'>
-      <div>
-        <Link
-          to='/'
-          className='text-muted-foreground hover:text-foreground text-sm'
-        >
-          &larr; Back to tools
-        </Link>
-      </div>
-
-      <div>
-        <h1 className='mb-2 text-2xl font-bold'>Math Renderer</h1>
-        <p className='text-muted-foreground'>
-          Render LaTeX math expressions using KaTeX. Enter your expression below
-          to see it rendered in real-time.
-        </p>
-      </div>
-
+    <Tool toolId='math-renderer' error={error}>
       <div className='max-w-2xl space-y-4'>
         <div>
           <label className='text-sm font-medium'>LaTeX Expression</label>
@@ -91,12 +74,6 @@ export function MathRendererTool() {
         </div>
       </div>
 
-      {error && (
-        <div className='border-destructive/50 bg-destructive/10 text-destructive max-w-2xl rounded-lg border p-4'>
-          {error}
-        </div>
-      )}
-
       {rendered && (
         <div className='border-border bg-card max-w-2xl overflow-hidden rounded-lg border'>
           <div className='border-border bg-accent border-b px-4 py-2'>
@@ -108,6 +85,6 @@ export function MathRendererTool() {
           />
         </div>
       )}
-    </div>
+    </Tool>
   );
 }
