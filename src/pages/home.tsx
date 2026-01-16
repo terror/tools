@@ -2,6 +2,30 @@ import { tools } from '@/lib/tools';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query.trim()) return <>{text}</>;
+
+  const regex = new RegExp(
+    `(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`,
+    'gi'
+  );
+  const parts = text.split(regex);
+
+  return (
+    <>
+      {parts.map((part, i) =>
+        regex.test(part) ? (
+          <mark key={i} className='rounded-sm bg-yellow-200 dark:bg-yellow-800'>
+            {part}
+          </mark>
+        ) : (
+          part
+        )
+      )}
+    </>
+  );
+}
+
 export function Home() {
   const [search, setSearch] = useState('');
 
@@ -35,8 +59,12 @@ export function Home() {
             to={tool.path}
             className='border-border hover:border-primary hover:bg-accent block rounded-lg border p-4 transition-colors'
           >
-            <h2 className='mb-1 font-semibold'>{tool.name}</h2>
-            <p className='text-muted-foreground text-sm'>{tool.description}</p>
+            <h2 className='mb-1 font-semibold'>
+              <Highlight text={tool.name} query={search} />
+            </h2>
+            <p className='text-muted-foreground text-sm'>
+              <Highlight text={tool.description} query={search} />
+            </p>
           </Link>
         ))}
         {filteredTools.length === 0 && (
