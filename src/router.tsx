@@ -1,6 +1,5 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
-import { MarkdownPreviewTool } from '@/pages/tools/markdown-preview';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
 import { ReadabilityTool } from '@/pages/tools/readability';
 import {
@@ -31,17 +30,10 @@ const mathRendererRoute = createRoute({
   component: MathRendererTool,
 });
 
-const markdownPreviewRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/tools/markdown-preview',
-  component: MarkdownPreviewTool,
-});
-
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
   mathRendererRoute,
-  markdownPreviewRoute,
 ]);
 
 export const router = createRouter({ routeTree });
