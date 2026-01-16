@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const EXAMPLE_EXPRESSIONS = [
   '\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
@@ -13,14 +13,10 @@ const EXAMPLE_EXPRESSIONS = [
 export function MathRendererTool() {
   const [input, setInput] = useState(EXAMPLE_EXPRESSIONS[0]);
   const [displayMode, setDisplayMode] = useState(true);
-  const [rendered, setRendered] = useState('');
-  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const { rendered, error } = useMemo(() => {
     if (!input.trim()) {
-      setRendered('');
-      setError(null);
-      return;
+      return { rendered: '', error: null };
     }
 
     try {
@@ -28,13 +24,13 @@ export function MathRendererTool() {
         throwOnError: true,
         displayMode,
       });
-      setRendered(html);
-      setError(null);
+      return { rendered: html, error: null };
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to render expression'
-      );
-      setRendered('');
+      return {
+        rendered: '',
+        error:
+          err instanceof Error ? err.message : 'Failed to render expression',
+      };
     }
   }, [input, displayMode]);
 
