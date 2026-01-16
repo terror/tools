@@ -1,5 +1,6 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
+import { MathRendererTool } from '@/pages/tools/math-renderer';
 import { ReadabilityTool } from '@/pages/tools/readability';
 import {
   createRootRoute,
@@ -23,7 +24,17 @@ const readabilityRoute = createRoute({
   component: ReadabilityTool,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, readabilityRoute]);
+const mathRendererRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/math-renderer',
+  component: MathRendererTool,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  readabilityRoute,
+  mathRendererRoute,
+]);
 
 export const router = createRouter({ routeTree });
 
