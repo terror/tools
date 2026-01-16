@@ -297,7 +297,7 @@ export function DiffViewerTool() {
                 key={`${pr.owner}-${pr.repo}-${pr.prNumber}`}
                 variant='outline'
                 size='sm'
-                className='h-6 px-2 text-xs'
+                className='h-6 cursor-pointer px-2 text-xs'
                 disabled={loading}
                 onClick={() => fetchPatch(pr.owner, pr.repo, pr.prNumber)}
               >
