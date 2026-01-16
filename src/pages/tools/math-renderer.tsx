@@ -1,7 +1,8 @@
 import { Tool } from '@/components/tool';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 const EXAMPLE_EXPRESSIONS = [
   '\\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
@@ -34,8 +35,17 @@ export function MathRendererTool() {
     }
   }, [input, displayMode]);
 
+  const prevErrorRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (error && error !== prevErrorRef.current) {
+      toast.error(error);
+    }
+    prevErrorRef.current = error;
+  }, [error]);
+
   return (
-    <Tool toolId='math-renderer' error={error}>
+    <Tool toolId='math-renderer'>
       <div className='max-w-2xl space-y-4'>
         <div>
           <label className='text-sm font-medium'>LaTeX Expression</label>

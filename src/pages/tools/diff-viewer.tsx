@@ -124,7 +124,6 @@ export function DiffViewerTool() {
 
   const [config, setConfig] = useState<DiffConfig>(loadConfig);
   const [currentGitHubUrl, setCurrentGitHubUrl] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [patch, setPatch] = useState('');
   const [prUrl, setPrUrl] = useState('');
@@ -141,7 +140,6 @@ export function DiffViewerTool() {
       const shortParam = `${owner}-${repo}-${prNumber}`;
 
       setLoading(true);
-      setError(null);
 
       try {
         const response = await fetch(
@@ -170,7 +168,9 @@ export function DiffViewerTool() {
         newUrl.searchParams.set('q', shortParam);
         window.history.replaceState({}, '', newUrl.toString());
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch patch');
+        toast.error(
+          err instanceof Error ? err.message : 'Failed to fetch patch'
+        );
       } finally {
         setLoading(false);
       }
@@ -183,7 +183,7 @@ export function DiffViewerTool() {
       const match = url.match(GITHUB_PR_REGEX);
 
       if (!match) {
-        setError(
+        toast.error(
           'Invalid GitHub PR URL. Expected format: https://github.com/owner/repo/pull/123'
         );
 
@@ -259,7 +259,7 @@ export function DiffViewerTool() {
   };
 
   return (
-    <Tool toolId='diff-viewer' error={error}>
+    <Tool toolId='diff-viewer'>
       <div className='space-y-6'>
         <div className='space-y-2'>
           <label htmlFor='pr-url' className='text-sm font-medium'>
@@ -270,10 +270,7 @@ export function DiffViewerTool() {
               id='pr-url'
               type='url'
               value={prUrl}
-              onChange={(e) => {
-                setPrUrl(e.target.value);
-                setError(null);
-              }}
+              onChange={(e) => setPrUrl(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' && prUrl.trim()) {
                   fetchPrPatch();
