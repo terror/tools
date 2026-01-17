@@ -51,4 +51,12 @@ export const tools: Tool[] = [
     path: '/tools/emoji-smuggler',
     createdAt: '2026-01-16',
   },
+  {
+    id: 'url-map',
+    name: 'URL Map',
+    description:
+      'Visualize the link structure of a website with an interactive graph.',
+    path: '/tools/url-map',
+    createdAt: '2026-01-16',
+  },
 ];

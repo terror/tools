@@ -5,6 +5,7 @@ import { EmojiSmugglerTool } from '@/pages/tools/emoji-smuggler';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
 import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
+import { URLMapTool } from '@/pages/tools/url-map';
 import { WordCounterTool } from '@/pages/tools/word-counter';
 import {
   createRootRoute,
@@ -58,6 +59,12 @@ const emojiSmugglerRoute = createRoute({
   component: EmojiSmugglerTool,
 });
 
+const urlMapRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/url-map',
+  component: URLMapTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
@@ -66,6 +73,7 @@ const routeTree = rootRoute.addChildren([
   diffViewerRoute,
   wordCounterRoute,
   emojiSmugglerRoute,
+  urlMapRoute,
 ]);
 
 export const router = createRouter({ routeTree });
