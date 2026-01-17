@@ -40,7 +40,7 @@ const MODE_COLORS: Record<TimerMode, string> = {
   longBreak: 'bg-blue-500',
 };
 
-export function PomodoroTimerTool() {
+export function PomodoroTool() {
   const [config, setConfig] = useState<TimerConfig>(DEFAULT_CONFIG);
   const [mode, setMode] = useState<TimerMode>('work');
   const [timeLeft, setTimeLeft] = useState(config.work * 60);
@@ -169,7 +169,7 @@ export function PomodoroTimerTool() {
   };
 
   return (
-    <Tool toolId='pomodoro-timer'>
+    <Tool toolId='pomodoro'>
       <div className='flex max-w-md flex-col items-center space-y-8'>
         <div className='flex gap-2'>
           {(Object.keys(MODE_LABELS) as TimerMode[]).map((m) => (

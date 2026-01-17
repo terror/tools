@@ -22,10 +22,10 @@ export const tools: Tool[] = [
     createdAt: '2026-01-15',
   },
   {
-    id: 'pomodoro-timer',
-    name: 'Pomodoro Timer',
+    id: 'pomodoro',
+    name: 'Pomodoro',
     description: 'Stay focused with customizable work and break intervals.',
-    path: '/tools/pomodoro-timer',
+    path: '/tools/pomodoro',
     createdAt: '2026-01-15',
   },
   {
