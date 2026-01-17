@@ -3,6 +3,7 @@ import { Home } from '@/pages/home';
 import { DiffViewerTool } from '@/pages/tools/diff-viewer';
 import { EmojiSmugglerTool } from '@/pages/tools/emoji-smuggler';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
+import { OcrTool } from '@/pages/tools/ocr';
 import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
 import { WordCounterTool } from '@/pages/tools/word-counter';
@@ -58,6 +59,12 @@ const emojiSmugglerRoute = createRoute({
   component: EmojiSmugglerTool,
 });
 
+const ocrRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/ocr',
+  component: OcrTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
@@ -66,6 +73,7 @@ const routeTree = rootRoute.addChildren([
   diffViewerRoute,
   wordCounterRoute,
   emojiSmugglerRoute,
+  ocrRoute,
 ]);
 
 export const router = createRouter({ routeTree });

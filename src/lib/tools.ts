@@ -51,4 +51,12 @@ export const tools: Tool[] = [
     path: '/tools/emoji-smuggler',
     createdAt: '2026-01-16',
   },
+  {
+    id: 'ocr',
+    name: 'OCR',
+    description:
+      'Extract text from PDF documents and images using optical character recognition.',
+    path: '/tools/ocr',
+    createdAt: '2026-01-16',
+  },
 ];
