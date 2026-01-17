@@ -45,7 +45,13 @@ type AlignContent =
   | 'stretch'
   | 'space-between'
   | 'space-around';
-type AlignSelf = 'auto' | 'flex-start' | 'flex-end' | 'center' | 'stretch' | 'baseline';
+type AlignSelf =
+  | 'auto'
+  | 'flex-start'
+  | 'flex-end'
+  | 'center'
+  | 'stretch'
+  | 'baseline';
 
 interface ContainerProps {
   flexDirection: FlexDirection;
@@ -102,17 +108,22 @@ function PropertySelect<T extends string>({
   highlight,
 }: PropertySelectProps<T>) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-muted-foreground text-xs font-medium">{label}</label>
+    <div className='space-y-1.5'>
+      <label className='text-muted-foreground text-xs font-medium'>
+        {label}
+      </label>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger
-          className={cn('h-8 text-xs', highlight && 'border-primary ring-primary/20 ring-2')}
+          className={cn(
+            'h-8 text-xs',
+            highlight && 'border-primary ring-primary/20 ring-2'
+          )}
         >
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
-            <SelectItem key={option} value={option} className="text-xs">
+            <SelectItem key={option} value={option} className='text-xs'>
               {option}
             </SelectItem>
           ))}
@@ -140,14 +151,19 @@ function PropertyInput({
   highlight,
 }: PropertyInputProps) {
   return (
-    <div className="space-y-1.5">
-      <label className="text-muted-foreground text-xs font-medium">{label}</label>
+    <div className='space-y-1.5'>
+      <label className='text-muted-foreground text-xs font-medium'>
+        {label}
+      </label>
       <Input
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         min={min}
-        className={cn('h-8 text-xs', highlight && 'border-primary ring-primary/20 ring-2')}
+        className={cn(
+          'h-8 text-xs',
+          highlight && 'border-primary ring-primary/20 ring-2'
+        )}
       />
     </div>
   );
@@ -168,34 +184,36 @@ export function FlexboxPlaygroundTool() {
     [items, selectedItemId]
   );
 
-  const updateContainer = useCallback(<K extends keyof ContainerProps>(
-    key: K,
-    value: ContainerProps[K]
-  ) => {
-    setContainer((prev) => ({ ...prev, [key]: value }));
-  }, []);
+  const updateContainer = useCallback(
+    <K extends keyof ContainerProps>(key: K, value: ContainerProps[K]) => {
+      setContainer((prev) => ({ ...prev, [key]: value }));
+    },
+    []
+  );
 
-  const updateItem = useCallback(<K extends keyof ItemProps>(
-    id: number,
-    key: K,
-    value: ItemProps[K]
-  ) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [key]: value } : item))
-    );
-  }, []);
+  const updateItem = useCallback(
+    <K extends keyof ItemProps>(id: number, key: K, value: ItemProps[K]) => {
+      setItems((prev) =>
+        prev.map((item) => (item.id === id ? { ...item, [key]: value } : item))
+      );
+    },
+    []
+  );
 
   const addItem = useCallback(() => {
     setItems((prev) => [...prev, createItem(nextId)]);
     setNextId((prev) => prev + 1);
   }, [nextId]);
 
-  const removeItem = useCallback((id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id));
-    if (selectedItemId === id) {
-      setSelectedItemId(null);
-    }
-  }, [selectedItemId]);
+  const removeItem = useCallback(
+    (id: number) => {
+      setItems((prev) => prev.filter((item) => item.id !== id));
+      if (selectedItemId === id) {
+        setSelectedItemId(null);
+      }
+    },
+    [selectedItemId]
+  );
 
   const resetAll = useCallback(() => {
     setContainer(DEFAULT_CONTAINER);
@@ -231,14 +249,16 @@ export function FlexboxPlaygroundTool() {
     const itemCSS = itemsWithCustomProps
       .map((item) => {
         const props: string[] = [];
-        if (item.flexGrow !== DEFAULT_ITEM.flexGrow) props.push(`  flex-grow: ${item.flexGrow};`);
+        if (item.flexGrow !== DEFAULT_ITEM.flexGrow)
+          props.push(`  flex-grow: ${item.flexGrow};`);
         if (item.flexShrink !== DEFAULT_ITEM.flexShrink)
           props.push(`  flex-shrink: ${item.flexShrink};`);
         if (item.flexBasis !== DEFAULT_ITEM.flexBasis)
           props.push(`  flex-basis: ${item.flexBasis};`);
         if (item.alignSelf !== DEFAULT_ITEM.alignSelf)
           props.push(`  align-self: ${item.alignSelf};`);
-        if (item.order !== DEFAULT_ITEM.order) props.push(`  order: ${item.order};`);
+        if (item.order !== DEFAULT_ITEM.order)
+          props.push(`  order: ${item.order};`);
         return `.item-${item.id} {\n${props.join('\n')}\n}`;
       })
       .join('\n\n');
@@ -252,73 +272,100 @@ export function FlexboxPlaygroundTool() {
   }, [generatedCSS]);
 
   return (
-    <Tool toolId="flexbox-playground">
-      <div className="space-y-6">
+    <Tool toolId='flexbox-playground'>
+      <div className='space-y-6'>
         {/* Controls */}
-        <div className="grid gap-6 lg:grid-cols-2">
+        <div className='grid gap-6 lg:grid-cols-2'>
           {/* Container Properties */}
-          <div className="border-border bg-card space-y-4 rounded-xl border p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">Container Properties</h3>
-              <Button variant="ghost" size="icon-sm" onClick={resetAll} title="Reset all">
-                <RotateCcw className="h-4 w-4" />
+          <div className='border-border bg-card space-y-4 rounded-xl border p-5'>
+            <div className='flex items-center justify-between'>
+              <h3 className='font-semibold'>Container Properties</h3>
+              <Button
+                variant='ghost'
+                size='icon-sm'
+                onClick={resetAll}
+                title='Reset all'
+              >
+                <RotateCcw className='h-4 w-4' />
               </Button>
             </div>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
               <PropertySelect
-                label="flex-direction"
+                label='flex-direction'
                 value={container.flexDirection}
-                options={['row', 'row-reverse', 'column', 'column-reverse'] as const}
+                options={
+                  ['row', 'row-reverse', 'column', 'column-reverse'] as const
+                }
                 onChange={(v) => updateContainer('flexDirection', v)}
-                highlight={container.flexDirection !== DEFAULT_CONTAINER.flexDirection}
+                highlight={
+                  container.flexDirection !== DEFAULT_CONTAINER.flexDirection
+                }
               />
               <PropertySelect
-                label="justify-content"
+                label='justify-content'
                 value={container.justifyContent}
-                options={[
-                  'flex-start',
-                  'flex-end',
-                  'center',
-                  'space-between',
-                  'space-around',
-                  'space-evenly',
-                ] as const}
+                options={
+                  [
+                    'flex-start',
+                    'flex-end',
+                    'center',
+                    'space-between',
+                    'space-around',
+                    'space-evenly',
+                  ] as const
+                }
                 onChange={(v) => updateContainer('justifyContent', v)}
-                highlight={container.justifyContent !== DEFAULT_CONTAINER.justifyContent}
+                highlight={
+                  container.justifyContent !== DEFAULT_CONTAINER.justifyContent
+                }
               />
               <PropertySelect
-                label="align-items"
+                label='align-items'
                 value={container.alignItems}
-                options={['flex-start', 'flex-end', 'center', 'stretch', 'baseline'] as const}
+                options={
+                  [
+                    'flex-start',
+                    'flex-end',
+                    'center',
+                    'stretch',
+                    'baseline',
+                  ] as const
+                }
                 onChange={(v) => updateContainer('alignItems', v)}
-                highlight={container.alignItems !== DEFAULT_CONTAINER.alignItems}
+                highlight={
+                  container.alignItems !== DEFAULT_CONTAINER.alignItems
+                }
               />
               <PropertySelect
-                label="flex-wrap"
+                label='flex-wrap'
                 value={container.flexWrap}
                 options={['nowrap', 'wrap', 'wrap-reverse'] as const}
                 onChange={(v) => updateContainer('flexWrap', v)}
                 highlight={container.flexWrap !== DEFAULT_CONTAINER.flexWrap}
               />
               <PropertySelect
-                label="align-content"
+                label='align-content'
                 value={container.alignContent}
-                options={[
-                  'flex-start',
-                  'flex-end',
-                  'center',
-                  'stretch',
-                  'space-between',
-                  'space-around',
-                ] as const}
+                options={
+                  [
+                    'flex-start',
+                    'flex-end',
+                    'center',
+                    'stretch',
+                    'space-between',
+                    'space-around',
+                  ] as const
+                }
                 onChange={(v) => updateContainer('alignContent', v)}
-                highlight={container.alignContent !== DEFAULT_CONTAINER.alignContent}
+                highlight={
+                  container.alignContent !== DEFAULT_CONTAINER.alignContent
+                }
               />
               <PropertyInput
-                label="gap (px)"
+                label='gap (px)'
                 value={container.gap}
                 onChange={(v) => updateContainer('gap', parseInt(v) || 0)}
-                type="number"
+                type='number'
                 min={0}
                 highlight={container.gap !== DEFAULT_CONTAINER.gap}
               />
@@ -326,89 +373,105 @@ export function FlexboxPlaygroundTool() {
           </div>
 
           {/* Item Properties */}
-          <div className="border-border bg-card space-y-4 rounded-xl border p-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold">
+          <div className='border-border bg-card space-y-4 rounded-xl border p-5'>
+            <div className='flex items-center justify-between'>
+              <h3 className='font-semibold'>
                 Item Properties
                 {selectedItem && (
-                  <span className="text-muted-foreground ml-2 text-sm font-normal">
+                  <span className='text-muted-foreground ml-2 text-sm font-normal'>
                     (Item {selectedItem.id})
                   </span>
                 )}
               </h3>
-              <div className="flex gap-1">
+              <div className='flex gap-1'>
                 <Button
-                  variant="ghost"
-                  size="icon-sm"
+                  variant='ghost'
+                  size='icon-sm'
                   onClick={addItem}
-                  title="Add item"
+                  title='Add item'
                   disabled={items.length >= 12}
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className='h-4 w-4' />
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="icon-sm"
+                  variant='ghost'
+                  size='icon-sm'
                   onClick={() => selectedItemId && removeItem(selectedItemId)}
-                  title="Remove selected item"
+                  title='Remove selected item'
                   disabled={!selectedItemId || items.length <= 1}
                 >
-                  <Minus className="h-4 w-4" />
+                  <Minus className='h-4 w-4' />
                 </Button>
               </div>
             </div>
             {selectedItem ? (
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className='grid grid-cols-2 gap-3 sm:grid-cols-3'>
                 <PropertyInput
-                  label="flex-grow"
+                  label='flex-grow'
                   value={selectedItem.flexGrow}
                   onChange={(v) =>
-                    updateItem(selectedItem.id, 'flexGrow', Math.max(0, parseInt(v) || 0))
+                    updateItem(
+                      selectedItem.id,
+                      'flexGrow',
+                      Math.max(0, parseInt(v) || 0)
+                    )
                   }
-                  type="number"
+                  type='number'
                   min={0}
                   highlight={selectedItem.flexGrow !== DEFAULT_ITEM.flexGrow}
                 />
                 <PropertyInput
-                  label="flex-shrink"
+                  label='flex-shrink'
                   value={selectedItem.flexShrink}
                   onChange={(v) =>
-                    updateItem(selectedItem.id, 'flexShrink', Math.max(0, parseInt(v) || 0))
+                    updateItem(
+                      selectedItem.id,
+                      'flexShrink',
+                      Math.max(0, parseInt(v) || 0)
+                    )
                   }
-                  type="number"
+                  type='number'
                   min={0}
-                  highlight={selectedItem.flexShrink !== DEFAULT_ITEM.flexShrink}
+                  highlight={
+                    selectedItem.flexShrink !== DEFAULT_ITEM.flexShrink
+                  }
                 />
                 <PropertyInput
-                  label="flex-basis"
+                  label='flex-basis'
                   value={selectedItem.flexBasis}
-                  onChange={(v) => updateItem(selectedItem.id, 'flexBasis', v || 'auto')}
+                  onChange={(v) =>
+                    updateItem(selectedItem.id, 'flexBasis', v || 'auto')
+                  }
                   highlight={selectedItem.flexBasis !== DEFAULT_ITEM.flexBasis}
                 />
                 <PropertySelect
-                  label="align-self"
+                  label='align-self'
                   value={selectedItem.alignSelf}
-                  options={[
-                    'auto',
-                    'flex-start',
-                    'flex-end',
-                    'center',
-                    'stretch',
-                    'baseline',
-                  ] as const}
+                  options={
+                    [
+                      'auto',
+                      'flex-start',
+                      'flex-end',
+                      'center',
+                      'stretch',
+                      'baseline',
+                    ] as const
+                  }
                   onChange={(v) => updateItem(selectedItem.id, 'alignSelf', v)}
                   highlight={selectedItem.alignSelf !== DEFAULT_ITEM.alignSelf}
                 />
                 <PropertyInput
-                  label="order"
+                  label='order'
                   value={selectedItem.order}
-                  onChange={(v) => updateItem(selectedItem.id, 'order', parseInt(v) || 0)}
-                  type="number"
+                  onChange={(v) =>
+                    updateItem(selectedItem.id, 'order', parseInt(v) || 0)
+                  }
+                  type='number'
                   highlight={selectedItem.order !== DEFAULT_ITEM.order}
                 />
               </div>
             ) : (
-              <div className="text-muted-foreground flex h-[88px] items-center justify-center text-sm">
+              <div className='text-muted-foreground flex h-[88px] items-center justify-center text-sm'>
                 Click on an item in the preview to edit its properties
               </div>
             )}
@@ -416,15 +479,15 @@ export function FlexboxPlaygroundTool() {
         </div>
 
         {/* Preview */}
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
-          <div className="border-border flex items-center justify-between border-b px-5 py-3">
-            <h3 className="font-semibold">Preview</h3>
-            <div className="text-muted-foreground text-xs">
+        <div className='border-border bg-card overflow-hidden rounded-xl border'>
+          <div className='border-border flex items-center justify-between border-b px-5 py-3'>
+            <h3 className='font-semibold'>Preview</h3>
+            <div className='text-muted-foreground text-xs'>
               {items.length} item{items.length !== 1 ? 's' : ''}
             </div>
           </div>
           <div
-            className="bg-muted/30 min-h-[300px] p-4"
+            className='bg-muted/30 min-h-[300px] p-4'
             style={{
               backgroundImage:
                 'radial-gradient(circle, hsl(var(--muted-foreground) / 0.15) 1px, transparent 1px)',
@@ -432,7 +495,7 @@ export function FlexboxPlaygroundTool() {
             }}
           >
             <div
-              className="border-primary/30 bg-background/50 min-h-[268px] rounded-lg border-2 border-dashed p-3 backdrop-blur-sm"
+              className='border-primary/30 bg-background/50 min-h-[268px] rounded-lg border-2 border-dashed p-3 backdrop-blur-sm'
               style={{
                 display: 'flex',
                 flexDirection: container.flexDirection,
@@ -456,11 +519,14 @@ export function FlexboxPlaygroundTool() {
                 return (
                   <button
                     key={item.id}
-                    onClick={() => setSelectedItemId(isSelected ? null : item.id)}
+                    onClick={() =>
+                      setSelectedItemId(isSelected ? null : item.id)
+                    }
                     className={cn(
                       'flex min-h-[60px] min-w-[60px] cursor-pointer items-center justify-center rounded-lg font-bold text-white shadow-lg transition-all',
                       colorClass,
-                      isSelected && 'ring-primary ring-4 ring-offset-2 ring-offset-background scale-105',
+                      isSelected &&
+                        'ring-primary ring-offset-background scale-105 ring-4 ring-offset-2',
                       !isSelected && 'hover:scale-105 hover:shadow-xl',
                       hasCustomProps && !isSelected && 'ring-2 ring-white/50'
                     )}
@@ -482,16 +548,21 @@ export function FlexboxPlaygroundTool() {
         </div>
 
         {/* Generated CSS */}
-        <div className="border-border bg-card overflow-hidden rounded-xl border">
-          <div className="border-border flex items-center justify-between border-b px-5 py-3">
-            <h3 className="font-semibold">Generated CSS</h3>
-            <Button variant="ghost" size="sm" onClick={copyCSS} className="gap-2">
-              <Copy className="h-3.5 w-3.5" />
+        <div className='border-border bg-card overflow-hidden rounded-xl border'>
+          <div className='border-border flex items-center justify-between border-b px-5 py-3'>
+            <h3 className='font-semibold'>Generated CSS</h3>
+            <Button
+              variant='ghost'
+              size='sm'
+              onClick={copyCSS}
+              className='gap-2'
+            >
+              <Copy className='h-3.5 w-3.5' />
               Copy
             </Button>
           </div>
-          <pre className="bg-muted/30 overflow-x-auto p-5">
-            <code className="text-sm">{generatedCSS}</code>
+          <pre className='bg-muted/30 overflow-x-auto p-5'>
+            <code className='text-sm'>{generatedCSS}</code>
           </pre>
         </div>
       </div>
