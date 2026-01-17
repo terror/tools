@@ -423,7 +423,6 @@ graph.
 ```tsx
 // Loads 1,583 modules, takes ~2.8s extra in dev
 // Runtime cost: 200-800ms on every cold start
-
 import { Button, TextField } from '@mui/material';
 import { Check, Menu, X } from 'lucide-react';
 
@@ -434,7 +433,6 @@ import { Check, Menu, X } from 'lucide-react';
 
 ```tsx
 // Loads only 3 modules (~2KB vs ~1MB)
-
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Check from 'lucide-react/dist/esm/icons/check';
