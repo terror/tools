@@ -3,6 +3,7 @@ import { Home } from '@/pages/home';
 import { DiffViewerTool } from '@/pages/tools/diff-viewer';
 import { EmojiSmugglerTool } from '@/pages/tools/emoji-smuggler';
 import { MathRendererTool } from '@/pages/tools/math-renderer';
+import { FlexboxPlaygroundTool } from '@/pages/tools/flexbox-playground';
 import { OcrTool } from '@/pages/tools/ocr';
 import { PomodoroTimerTool } from '@/pages/tools/pomodoro-timer';
 import { ReadabilityTool } from '@/pages/tools/readability';
@@ -65,6 +66,12 @@ const ocrRoute = createRoute({
   component: OcrTool,
 });
 
+const flexboxPlaygroundRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/flexbox-playground',
+  component: FlexboxPlaygroundTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
@@ -74,6 +81,7 @@ const routeTree = rootRoute.addChildren([
   wordCounterRoute,
   emojiSmugglerRoute,
   ocrRoute,
+  flexboxPlaygroundRoute,
 ]);
 
 export const router = createRouter({ routeTree });

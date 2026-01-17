@@ -59,4 +59,12 @@ export const tools: Tool[] = [
     path: '/tools/ocr',
     createdAt: '2026-01-16',
   },
+  {
+    id: 'flexbox-playground',
+    name: 'Flexbox Playground',
+    description:
+      'Experiment with CSS Flexbox properties in real-time using this interactive playground.',
+    path: '/tools/flexbox-playground',
+    createdAt: '2026-01-17',
+  },
 ];
