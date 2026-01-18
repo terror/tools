@@ -15,8 +15,8 @@ export const tools: Tool[] = [
     createdAt: '2026-01-15',
   },
   {
-    id: 'math-renderer',
-    name: 'Math Renderer',
+    id: 'math',
+    name: 'Math',
     description: 'Render LaTeX math expressions using KaTeX.',
     path: '/tools/math-renderer',
     createdAt: '2026-01-15',
@@ -29,23 +29,23 @@ export const tools: Tool[] = [
     createdAt: '2026-01-15',
   },
   {
-    id: 'diff-viewer',
-    name: 'Diff Viewer',
+    id: 'diffs',
+    name: 'Diffs',
     description:
       'Render and visualize diffs from pasted patches with customizable display options.',
     path: '/tools/diff-viewer',
     createdAt: '2026-01-15',
   },
   {
-    id: 'word-counter',
-    name: 'Word Counter',
+    id: 'counter',
+    name: 'Counter',
     description: 'Count words, characters, and analyze text statistics.',
     path: '/tools/word-counter',
     createdAt: '2026-01-16',
   },
   {
-    id: 'emoji-smuggler',
-    name: 'Emoji Smuggler',
+    id: 'smuggler',
+    name: 'Smuggler',
     description:
       'Hide and reveal secret messages in emoji using Unicode variation selectors.',
     path: '/tools/emoji-smuggler',
@@ -61,7 +61,7 @@ export const tools: Tool[] = [
   },
   {
     id: 'flexbox-playground',
-    name: 'Flexbox Playground',
+    name: 'Flexbox',
     description:
       'Experiment with CSS Flexbox properties in real-time using this interactive playground.',
     path: '/tools/flexbox-playground',
