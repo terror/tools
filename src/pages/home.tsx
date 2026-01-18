@@ -97,7 +97,7 @@ export function Home() {
         </p>
       </div>
 
-      <div className='flex flex-wrap gap-3'>
+      <div className='flex flex-wrap items-center gap-3'>
         <input
           type='text'
           placeholder='Search tools...'
@@ -126,7 +126,7 @@ export function Home() {
           <Link
             key={tool.id}
             to={tool.path}
-            className='border-border hover:border-primary hover:bg-accent block rounded-lg border p-4 transition-colors'
+            className='hover:border-primary hover:bg-accent block rounded-lg p-4 transition-colors'
           >
             <h2 className='mb-1 font-semibold'>
               <Highlight text={tool.name} query={search} />
