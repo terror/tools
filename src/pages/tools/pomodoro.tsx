@@ -13,6 +13,7 @@ import { Settings } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 type TimerMode = 'work' | 'shortBreak' | 'longBreak';
+type Timers = Record<TimerMode, number>;
 
 interface TimerConfig {
   work: number;
@@ -20,6 +21,19 @@ interface TimerConfig {
   longBreak: number;
   sessionsBeforeLongBreak: number;
 }
+
+interface StoredState {
+  activeMode: TimerMode;
+  viewMode: TimerMode;
+  timers: Timers;
+  isRunning: boolean;
+  completedSessions: number;
+  config: TimerConfig;
+  savedAt: number;
+  mode?: TimerMode;
+}
+
+const STORAGE_KEY = 'pomodoro-timer-state';
 
 const DEFAULT_CONFIG: TimerConfig = {
   work: 25,
@@ -40,85 +54,175 @@ const MODE_COLORS: Record<TimerMode, string> = {
   longBreak: 'bg-blue-500',
 };
 
-export function PomodoroTool() {
-  const [config, setConfig] = useState<TimerConfig>(DEFAULT_CONFIG);
-  const [mode, setMode] = useState<TimerMode>('work');
-  const [timeLeft, setTimeLeft] = useState(config.work * 60);
-  const [isRunning, setIsRunning] = useState(false);
-  const [completedSessions, setCompletedSessions] = useState(0);
-  const [showSettings, setShowSettings] = useState(false);
+function getDefaultTimers(config: TimerConfig): Timers {
+  return {
+    work: config.work * 60,
+    shortBreak: config.shortBreak * 60,
+    longBreak: config.longBreak * 60,
+  };
+}
+
+function loadStoredState(): Partial<StoredState> | null {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (stored) {
+      return JSON.parse(stored);
+    }
+  } catch {}
+
+  return null;
+}
+
+function getInitialState() {
+  const stored = loadStoredState();
+
+  if (!stored) {
+    return {
+      config: DEFAULT_CONFIG,
+      activeMode: 'work' as TimerMode,
+      viewMode: 'work' as TimerMode,
+      timers: getDefaultTimers(DEFAULT_CONFIG),
+      isRunning: false,
+      completedSessions: 0,
+    };
+  }
+
+  const config = stored.config ?? DEFAULT_CONFIG;
+
+  const activeMode: TimerMode = stored.activeMode ?? stored.mode ?? 'work';
+  const viewMode: TimerMode = stored.viewMode ?? stored.mode ?? 'work';
+
+  let timers: Timers = stored.timers ?? getDefaultTimers(config);
+  let isRunning = stored.isRunning ?? false;
+
+  const completedSessions = stored.completedSessions ?? 0;
+
+  if (isRunning && stored.savedAt) {
+    const elapsedSeconds = Math.floor((Date.now() - stored.savedAt) / 1000);
+
+    timers = { ...timers, [activeMode]: Math.max(0, timers[activeMode] - elapsedSeconds) };
+
+    if (timers[activeMode] === 0) {
+      isRunning = false;
+    }
+  }
+
+  return { config, activeMode, viewMode, timers, isRunning, completedSessions };
+}
+
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function playNotification() {
+  const audioContext = new AudioContext();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+  oscillator.frequency.value = 800;
+  oscillator.type = 'sine';
+
+  gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.01,
+    audioContext.currentTime + 0.5
+  );
+
+  oscillator.start(audioContext.currentTime);
+  oscillator.stop(audioContext.currentTime + 0.5);
+}
+
+function usePomodoroTimer() {
+  const [initialState] = useState(getInitialState);
+
+  const [config, setConfig] = useState<TimerConfig>(initialState.config);
+  const [isRunning, setIsRunning] = useState(initialState.isRunning);
+  const [activeMode, setActiveMode] = useState<TimerMode>(initialState.activeMode);
+  const [viewMode, setViewMode] = useState<TimerMode>(initialState.viewMode);
+  const [timers, setTimers] = useState<Timers>(initialState.timers);
+
+  const [completedSessions, setCompletedSessions] = useState(
+    initialState.completedSessions
+  );
 
   const intervalRef = useRef<number | null>(null);
   const completionHandlerRef = useRef<() => void>(() => {});
 
-  const totalTime = config[mode] * 60;
+  const timeLeft = timers[viewMode];
+  const totalTime = config[viewMode] * 60;
   const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
-  const playNotification = useCallback(() => {
-    const audioContext = new AudioContext();
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.frequency.value = 800;
-    oscillator.type = 'sine';
-
-    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(
-      0.01,
-      audioContext.currentTime + 0.5
+  useEffect(() => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        activeMode,
+        viewMode,
+        timers,
+        isRunning,
+        completedSessions,
+        config,
+        savedAt: Date.now(),
+      })
     );
+  }, [activeMode, viewMode, timers, isRunning, completedSessions, config]);
 
-    oscillator.start(audioContext.currentTime);
-    oscillator.stop(audioContext.currentTime + 0.5);
-  }, []);
+  useEffect(() => {
+    const activeTimeLeft = timers[activeMode];
+    document.title = `${formatTime(activeTimeLeft)} - ${MODE_LABELS[activeMode]}`;
+    return () => {
+      document.title = 'tools.liam.rs';
+    };
+  }, [timers, activeMode]);
 
-  const switchMode = useCallback(
-    (newMode: TimerMode) => {
-      setMode(newMode);
-      setTimeLeft(config[newMode] * 60);
-      setIsRunning(false);
+  const resetModeTimer = useCallback(
+    (targetMode: TimerMode) => {
+      setTimers((prev) => ({ ...prev, [targetMode]: config[targetMode] * 60 }));
     },
     [config]
   );
+
+  const switchView = useCallback((newMode: TimerMode) => {
+    setViewMode(newMode);
+  }, []);
 
   useEffect(() => {
     completionHandlerRef.current = () => {
       playNotification();
       setIsRunning(false);
+      resetModeTimer(activeMode);
 
-      if (mode === 'work') {
+      if (activeMode === 'work') {
         const newCompletedSessions = completedSessions + 1;
         setCompletedSessions(newCompletedSessions);
 
-        if (newCompletedSessions % config.sessionsBeforeLongBreak === 0) {
-          switchMode('longBreak');
-        } else {
-          switchMode('shortBreak');
-        }
+        const nextMode = newCompletedSessions % config.sessionsBeforeLongBreak === 0
+          ? 'longBreak'
+          : 'shortBreak';
+        setActiveMode(nextMode);
+        setViewMode(nextMode);
       } else {
-        switchMode('work');
+        setActiveMode('work');
+        setViewMode('work');
       }
     };
-  }, [
-    mode,
-    completedSessions,
-    config.sessionsBeforeLongBreak,
-    playNotification,
-    switchMode,
-  ]);
+  }, [activeMode, completedSessions, config.sessionsBeforeLongBreak, resetModeTimer]);
 
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = window.setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
+        setTimers((prev) => {
+          const currentTime = prev[activeMode];
+          if (currentTime <= 1) {
             setTimeout(() => completionHandlerRef.current(), 0);
-            return 0;
+            return { ...prev, [activeMode]: 0 };
           }
-          return prev - 1;
+          return { ...prev, [activeMode]: currentTime - 1 };
         });
       }, 1000);
     }
@@ -128,45 +232,90 @@ export function PomodoroTool() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning]);
+  }, [isRunning, activeMode]);
 
-  useEffect(() => {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    document.title = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} - ${MODE_LABELS[mode]}`;
+  const toggle = useCallback(() => {
+    setIsRunning((prev) => {
+      if (!prev) {
+        setActiveMode(viewMode);
+      }
+      return !prev;
+    });
+  }, [viewMode]);
 
-    return () => {
-      document.title = 'tools.liam.rs';
-    };
-  }, [timeLeft, mode]);
-
-  const toggleTimer = () => setIsRunning(!isRunning);
-
-  const resetTimer = () => {
+  const reset = useCallback(() => {
     setIsRunning(false);
-    setTimeLeft(config[mode] * 60);
-  };
+    resetModeTimer(viewMode);
+  }, [viewMode, resetModeTimer]);
 
-  const resetAll = () => {
+  const resetAll = useCallback(() => {
     setIsRunning(false);
-    setMode('work');
-    setTimeLeft(config.work * 60);
+    setActiveMode('work');
+    setViewMode('work');
+    setTimers(getDefaultTimers(config));
     setCompletedSessions(0);
-  };
+    localStorage.removeItem(STORAGE_KEY);
+  }, [config]);
 
-  const updateConfig = (key: keyof TimerConfig, value: number) => {
-    const newConfig = { ...config, [key]: value };
-    setConfig(newConfig);
-    if (!isRunning) {
-      setTimeLeft(newConfig[mode] * 60);
-    }
-  };
+  const updateConfig = useCallback(
+    (key: keyof TimerConfig, value: number) => {
+      setConfig((prev) => {
+        const newConfig = { ...prev, [key]: value };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        setTimers((prevTimers) => {
+          const updated = { ...prevTimers };
+          const modes: TimerMode[] = ['work', 'shortBreak', 'longBreak'];
+
+          for (const m of modes) {
+            if (m in newConfig && prevTimers[m] === prev[m] * 60) {
+              updated[m] = (newConfig[m] as number) * 60;
+            }
+          }
+
+          return updated;
+        });
+
+        return newConfig;
+      });
+    },
+    []
+  );
+
+  return {
+    activeMode,
+    viewMode,
+    timeLeft,
+    isRunning,
+    progress,
+    completedSessions,
+    config,
+    switchView,
+    toggle,
+    reset,
+    resetAll,
+    updateConfig,
   };
+}
+
+export function PomodoroTool() {
+  const {
+    activeMode,
+    viewMode,
+    timeLeft,
+    isRunning,
+    progress,
+    completedSessions,
+    config,
+    switchView,
+    toggle,
+    reset,
+    resetAll,
+    updateConfig,
+  } = usePomodoroTimer();
+
+  const [showSettings, setShowSettings] = useState(false);
+
+  const isActiveView = activeMode === viewMode;
 
   return (
     <Tool toolId='pomodoro'>
@@ -175,8 +324,9 @@ export function PomodoroTool() {
           {(Object.keys(MODE_LABELS) as TimerMode[]).map((m) => (
             <Button
               key={m}
-              onClick={() => switchMode(m)}
-              variant={mode === m ? 'default' : 'secondary'}
+              onClick={() => switchView(m)}
+              variant={viewMode === m ? 'default' : 'secondary'}
+              className={isRunning && activeMode === m && viewMode !== m ? 'animate-pulse' : ''}
             >
               {MODE_LABELS[m]}
             </Button>
@@ -205,9 +355,9 @@ export function PomodoroTool() {
               strokeDasharray={2 * Math.PI * 120}
               strokeDashoffset={2 * Math.PI * 120 * (1 - progress / 100)}
               className={`transition-all duration-1000 ${
-                mode === 'work'
+                viewMode === 'work'
                   ? 'text-red-500'
-                  : mode === 'shortBreak'
+                  : viewMode === 'shortBreak'
                     ? 'text-green-500'
                     : 'text-blue-500'
               }`}
@@ -219,23 +369,23 @@ export function PomodoroTool() {
               {formatTime(timeLeft)}
             </div>
             <div className='text-muted-foreground mt-2 text-sm'>
-              {MODE_LABELS[mode]}
+              {MODE_LABELS[viewMode]}
             </div>
           </div>
         </div>
 
         <div className='flex gap-4'>
           <Button
-            onClick={toggleTimer}
+            onClick={toggle}
             size='lg'
             className={`rounded-full px-8 ${
-              isRunning ? 'bg-orange-500 hover:bg-orange-600' : ''
+              isRunning && isActiveView ? 'bg-orange-500 hover:bg-orange-600' : ''
             }`}
           >
-            {isRunning ? 'Pause' : 'Start'}
+            {isRunning && isActiveView ? 'Pause' : 'Start'}
           </Button>
           <Button
-            onClick={resetTimer}
+            onClick={reset}
             variant='secondary'
             size='lg'
             className='rounded-full px-6'
