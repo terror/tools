@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { usePersistedState } from '@/hooks';
 import { useTheme } from '@/providers/theme-provider';
 import { type FileDiffMetadata, parsePatchFiles } from '@pierre/diffs';
 import { FileDiff } from '@pierre/diffs/react';
@@ -84,22 +85,6 @@ const DEFAULT_CONFIG: DiffConfig = {
   disableBackground: false,
 };
 
-const STORAGE_KEY = 'diff-viewer-config';
-
-function loadConfig(): DiffConfig {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-
-    if (stored) {
-      return { ...DEFAULT_CONFIG, ...JSON.parse(stored) };
-    }
-  } catch {
-    // ignore
-  }
-
-  return DEFAULT_CONFIG;
-}
-
 const EXAMPLE_PATCH = `diff --git a/src/utils.ts b/src/utils.ts
 index abc123..def456 100644
 --- a/src/utils.ts
@@ -122,16 +107,16 @@ index abc123..def456 100644
 export function DiffViewerTool() {
   const { theme } = useTheme();
 
-  const [config, setConfig] = useState<DiffConfig>(loadConfig);
+  const [config, setConfig, resetConfig] = usePersistedState(
+    'diff-viewer-config',
+    DEFAULT_CONFIG
+  );
+
   const [currentGitHubUrl, setCurrentGitHubUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [patch, setPatch] = useState('');
   const [prUrl, setPrUrl] = useState('');
   const [showSettings, setShowSettings] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
-  }, [config]);
 
   const fetchPatch = useCallback(
     async (owner: string, repo: string, prNumber: string) => {
@@ -251,11 +236,6 @@ export function DiffViewerTool() {
     value: DiffConfig[K]
   ) => {
     setConfig((prev) => ({ ...prev, [key]: value }));
-  };
-
-  const resetConfig = () => {
-    setConfig(DEFAULT_CONFIG);
-    localStorage.removeItem(STORAGE_KEY);
   };
 
   return (
