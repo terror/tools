@@ -5,6 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { usePersistedState } from '@/hooks';
 import { Tool, tools } from '@/lib/tools';
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
@@ -51,33 +52,13 @@ function Highlight({ text, query }: { text: string; query: string }) {
   );
 }
 
-const SORT_STORAGE_KEY = 'tools-sort-preference';
-
-function getInitialSort(): SortOption {
-  if (typeof window === 'undefined') return 'newest';
-
-  const stored = localStorage.getItem(SORT_STORAGE_KEY);
-
-  if (
-    stored === 'alphabetical' ||
-    stored === 'alphabetical-desc' ||
-    stored === 'newest' ||
-    stored === 'oldest'
-  ) {
-    return stored;
-  }
-
-  return 'newest';
-}
-
 export function Home() {
   const [search, setSearch] = useState('');
-  const [sortBy, setSortBy] = useState<SortOption>(getInitialSort);
 
-  function handleSortChange(value: SortOption) {
-    setSortBy(value);
-    localStorage.setItem(SORT_STORAGE_KEY, value);
-  }
+  const [sortBy, setSortBy] = usePersistedState<SortOption>(
+    'tools-sort-preference',
+    'newest'
+  );
 
   const filteredTools = sortTools(
     tools.filter(
@@ -107,7 +88,7 @@ export function Home() {
         />
         <Select
           value={sortBy}
-          onValueChange={(v) => handleSortChange(v as SortOption)}
+          onValueChange={(v) => setSortBy(v as SortOption)}
         >
           <SelectTrigger>
             <SelectValue />

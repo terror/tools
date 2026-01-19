@@ -9,6 +9,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { usePersistedState } from '@/hooks';
 import { Settings } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
@@ -22,15 +23,17 @@ interface TimerConfig {
   sessionsBeforeLongBreak: number;
 }
 
-interface StoredState {
+interface PomodoroState {
   activeMode: TimerMode;
   viewMode: TimerMode;
   timers: Timers;
   isRunning: boolean;
   completedSessions: number;
   config: TimerConfig;
+}
+
+interface StoredState extends PomodoroState {
   savedAt: number;
-  mode?: TimerMode;
 }
 
 const STORAGE_KEY = 'pomodoro-timer-state';
@@ -62,38 +65,20 @@ function getDefaultTimers(config: TimerConfig): Timers {
   };
 }
 
-function loadStoredState(): Partial<StoredState> | null {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
+const DEFAULT_STATE: PomodoroState = {
+  config: DEFAULT_CONFIG,
+  activeMode: 'work',
+  viewMode: 'work',
+  timers: getDefaultTimers(DEFAULT_CONFIG),
+  isRunning: false,
+  completedSessions: 0,
+};
 
-    if (stored) {
-      return JSON.parse(stored);
-    }
-  } catch {
-    // ignore
-  }
-
-  return null;
-}
-
-function getInitialState() {
-  const stored = loadStoredState();
-
-  if (!stored) {
-    return {
-      config: DEFAULT_CONFIG,
-      activeMode: 'work' as TimerMode,
-      viewMode: 'work' as TimerMode,
-      timers: getDefaultTimers(DEFAULT_CONFIG),
-      isRunning: false,
-      completedSessions: 0,
-    };
-  }
-
+function deserializeState(stored: StoredState): PomodoroState {
   const config = stored.config ?? DEFAULT_CONFIG;
 
-  const activeMode: TimerMode = stored.activeMode ?? stored.mode ?? 'work';
-  const viewMode: TimerMode = stored.viewMode ?? stored.mode ?? 'work';
+  const activeMode: TimerMode = stored.activeMode ?? 'work';
+  const viewMode: TimerMode = stored.viewMode ?? 'work';
 
   let timers: Timers = stored.timers ?? getDefaultTimers(config);
   let isRunning = stored.isRunning ?? false;
@@ -114,6 +99,10 @@ function getInitialState() {
   }
 
   return { config, activeMode, viewMode, timers, isRunning, completedSessions };
+}
+
+function serializeState(state: PomodoroState): StoredState {
+  return { ...state, savedAt: Date.now() };
 }
 
 function formatTime(seconds: number): string {
@@ -143,19 +132,16 @@ function playNotification() {
 }
 
 function usePomodoroTimer() {
-  const [initialState] = useState(getInitialState);
+  const [state, setState, clearState] = usePersistedState<
+    PomodoroState,
+    StoredState
+  >(STORAGE_KEY, DEFAULT_STATE, {
+    serialize: serializeState,
+    deserialize: deserializeState,
+  });
 
-  const [config, setConfig] = useState<TimerConfig>(initialState.config);
-  const [isRunning, setIsRunning] = useState(initialState.isRunning);
-  const [activeMode, setActiveMode] = useState<TimerMode>(
-    initialState.activeMode
-  );
-  const [viewMode, setViewMode] = useState<TimerMode>(initialState.viewMode);
-  const [timers, setTimers] = useState<Timers>(initialState.timers);
-
-  const [completedSessions, setCompletedSessions] = useState(
-    initialState.completedSessions
-  );
+  const { config, activeMode, viewMode, timers, isRunning, completedSessions } =
+    state;
 
   const intervalRef = useRef<number | null>(null);
   const completionHandlerRef = useRef<() => void>(() => {});
@@ -165,21 +151,6 @@ function usePomodoroTimer() {
   const progress = ((totalTime - timeLeft) / totalTime) * 100;
 
   useEffect(() => {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        activeMode,
-        viewMode,
-        timers,
-        isRunning,
-        completedSessions,
-        config,
-        savedAt: Date.now(),
-      })
-    );
-  }, [activeMode, viewMode, timers, isRunning, completedSessions, config]);
-
-  useEffect(() => {
     const activeTimeLeft = timers[activeMode];
     document.title = `${formatTime(activeTimeLeft)} - ${MODE_LABELS[activeMode]}`;
     return () => {
@@ -187,55 +158,54 @@ function usePomodoroTimer() {
     };
   }, [timers, activeMode]);
 
-  const resetModeTimer = useCallback(
-    (targetMode: TimerMode) => {
-      setTimers((prev) => ({ ...prev, [targetMode]: config[targetMode] * 60 }));
-    },
-    [config]
-  );
-
-  const switchView = useCallback((newMode: TimerMode) => {
-    setViewMode(newMode);
-  }, []);
-
   useEffect(() => {
     completionHandlerRef.current = () => {
       playNotification();
-      setIsRunning(false);
-      resetModeTimer(activeMode);
 
-      if (activeMode === 'work') {
-        const newCompletedSessions = completedSessions + 1;
-        setCompletedSessions(newCompletedSessions);
+      setState((prev) => {
+        const newCompletedSessions =
+          prev.activeMode === 'work'
+            ? prev.completedSessions + 1
+            : prev.completedSessions;
 
         const nextMode =
-          newCompletedSessions % config.sessionsBeforeLongBreak === 0
-            ? 'longBreak'
-            : 'shortBreak';
-        setActiveMode(nextMode);
-        setViewMode(nextMode);
-      } else {
-        setActiveMode('work');
-        setViewMode('work');
-      }
+          prev.activeMode === 'work'
+            ? newCompletedSessions % prev.config.sessionsBeforeLongBreak === 0
+              ? 'longBreak'
+              : 'shortBreak'
+            : 'work';
+
+        return {
+          ...prev,
+          isRunning: false,
+          timers: {
+            ...prev.timers,
+            [prev.activeMode]: prev.config[prev.activeMode] * 60,
+          },
+          activeMode: nextMode,
+          viewMode: nextMode,
+          completedSessions: newCompletedSessions,
+        };
+      });
     };
-  }, [
-    activeMode,
-    completedSessions,
-    config.sessionsBeforeLongBreak,
-    resetModeTimer,
-  ]);
+  }, [setState]);
 
   useEffect(() => {
     if (isRunning) {
       intervalRef.current = window.setInterval(() => {
-        setTimers((prev) => {
-          const currentTime = prev[activeMode];
+        setState((prev) => {
+          const currentTime = prev.timers[prev.activeMode];
           if (currentTime <= 1) {
             setTimeout(() => completionHandlerRef.current(), 0);
-            return { ...prev, [activeMode]: 0 };
+            return {
+              ...prev,
+              timers: { ...prev.timers, [prev.activeMode]: 0 },
+            };
           }
-          return { ...prev, [activeMode]: currentTime - 1 };
+          return {
+            ...prev,
+            timers: { ...prev.timers, [prev.activeMode]: currentTime - 1 },
+          };
         });
       }, 1000);
     }
@@ -245,51 +215,56 @@ function usePomodoroTimer() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, activeMode]);
+  }, [isRunning, setState]);
+
+  const switchView = useCallback(
+    (newMode: TimerMode) => {
+      setState((prev) => ({ ...prev, viewMode: newMode }));
+    },
+    [setState]
+  );
 
   const toggle = useCallback(() => {
-    setIsRunning((prev) => {
-      if (!prev) {
-        setActiveMode(viewMode);
-      }
-      return !prev;
-    });
-  }, [viewMode]);
+    setState((prev) => ({
+      ...prev,
+      isRunning: !prev.isRunning,
+      activeMode: !prev.isRunning ? prev.viewMode : prev.activeMode,
+    }));
+  }, [setState]);
 
   const reset = useCallback(() => {
-    setIsRunning(false);
-    resetModeTimer(viewMode);
-  }, [viewMode, resetModeTimer]);
+    setState((prev) => ({
+      ...prev,
+      isRunning: false,
+      timers: {
+        ...prev.timers,
+        [prev.viewMode]: prev.config[prev.viewMode] * 60,
+      },
+    }));
+  }, [setState]);
 
   const resetAll = useCallback(() => {
-    setIsRunning(false);
-    setActiveMode('work');
-    setViewMode('work');
-    setTimers(getDefaultTimers(config));
-    setCompletedSessions(0);
-    localStorage.removeItem(STORAGE_KEY);
-  }, [config]);
+    clearState();
+  }, [clearState]);
 
-  const updateConfig = useCallback((key: keyof TimerConfig, value: number) => {
-    setConfig((prev) => {
-      const newConfig = { ...prev, [key]: value };
-
-      setTimers((prevTimers) => {
-        const updated = { ...prevTimers };
+  const updateConfig = useCallback(
+    (key: keyof TimerConfig, value: number) => {
+      setState((prev) => {
+        const newConfig = { ...prev.config, [key]: value };
+        const updatedTimers = { ...prev.timers };
         const modes: TimerMode[] = ['work', 'shortBreak', 'longBreak'];
 
         for (const m of modes) {
-          if (m in newConfig && prevTimers[m] === prev[m] * 60) {
-            updated[m] = (newConfig[m] as number) * 60;
+          if (m in newConfig && prev.timers[m] === prev.config[m] * 60) {
+            updatedTimers[m] = (newConfig[m] as number) * 60;
           }
         }
 
-        return updated;
+        return { ...prev, config: newConfig, timers: updatedTimers };
       });
-
-      return newConfig;
-    });
-  }, []);
+    },
+    [setState]
+  );
 
   return {
     activeMode,
