@@ -104,7 +104,7 @@ index abc123..def456 100644
 +export const VERSION = "1.0.0";
 `;
 
-export function DiffViewerTool() {
+export function DiffsTool() {
   const { theme } = useTheme();
 
   const [config, setConfig, resetConfig] = usePersistedState(
@@ -239,7 +239,7 @@ export function DiffViewerTool() {
   };
 
   return (
-    <Tool toolId='diff-viewer'>
+    <Tool toolId='diffs'>
       <div className='space-y-6'>
         <div className='space-y-2'>
           <label htmlFor='pr-url' className='text-sm font-medium'>

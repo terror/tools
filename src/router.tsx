@@ -1,13 +1,13 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
-import { DiffViewerTool } from '@/pages/tools/diff-viewer';
-import { EmojiSmugglerTool } from '@/pages/tools/emoji-smuggler';
-import { FlexboxPlaygroundTool } from '@/pages/tools/flexbox-playground';
-import { MathRendererTool } from '@/pages/tools/math-renderer';
+import { CounterTool } from '@/pages/tools/counter';
+import { DiffsTool } from '@/pages/tools/diffs';
+import { FlexboxTool } from '@/pages/tools/flexbox';
+import { MathTool } from '@/pages/tools/math';
 import { OcrTool } from '@/pages/tools/ocr';
 import { PomodoroTool } from '@/pages/tools/pomodoro';
 import { ReadabilityTool } from '@/pages/tools/readability';
-import { WordCounterTool } from '@/pages/tools/word-counter';
+import { SmugglerTool } from '@/pages/tools/smuggler';
 import {
   createRootRoute,
   createRoute,
@@ -30,10 +30,10 @@ const readabilityRoute = createRoute({
   component: ReadabilityTool,
 });
 
-const mathRendererRoute = createRoute({
+const mathRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/math-renderer',
-  component: MathRendererTool,
+  path: '/tools/math',
+  component: MathTool,
 });
 
 const pomodoroRoute = createRoute({
@@ -42,22 +42,22 @@ const pomodoroRoute = createRoute({
   component: PomodoroTool,
 });
 
-const diffViewerRoute = createRoute({
+const diffsRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/diff-viewer',
-  component: DiffViewerTool,
+  path: '/tools/diffs',
+  component: DiffsTool,
 });
 
-const wordCounterRoute = createRoute({
+const counterRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/word-counter',
-  component: WordCounterTool,
+  path: '/tools/counter',
+  component: CounterTool,
 });
 
-const emojiSmugglerRoute = createRoute({
+const smugglerRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/emoji-smuggler',
-  component: EmojiSmugglerTool,
+  path: '/tools/smuggler',
+  component: SmugglerTool,
 });
 
 const ocrRoute = createRoute({
@@ -66,22 +66,22 @@ const ocrRoute = createRoute({
   component: OcrTool,
 });
 
-const flexboxPlaygroundRoute = createRoute({
+const flexboxRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/tools/flexbox-playground',
-  component: FlexboxPlaygroundTool,
+  path: '/tools/flexbox',
+  component: FlexboxTool,
 });
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
-  mathRendererRoute,
+  mathRoute,
   pomodoroRoute,
-  diffViewerRoute,
-  wordCounterRoute,
-  emojiSmugglerRoute,
+  diffsRoute,
+  counterRoute,
+  smugglerRoute,
   ocrRoute,
-  flexboxPlaygroundRoute,
+  flexboxRoute,
 ]);
 
 export const router = createRouter({ routeTree });

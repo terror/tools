@@ -11,7 +11,7 @@ const EXAMPLE_EXPRESSIONS = [
   'E = mc^2',
 ];
 
-export function MathRendererTool() {
+export function MathTool() {
   const [input, setInput] = useState(EXAMPLE_EXPRESSIONS[0]);
   const [displayMode, setDisplayMode] = useState(true);
 
@@ -45,7 +45,7 @@ export function MathRendererTool() {
   }, [error]);
 
   return (
-    <Tool toolId='math-renderer'>
+    <Tool toolId='math'>
       <div className='max-w-2xl space-y-4'>
         <div>
           <label className='text-sm font-medium'>LaTeX Expression</label>
