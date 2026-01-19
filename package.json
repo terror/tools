@@ -37,10 +37,6 @@
     "tailwindcss": "^4.1.18",
     "tesseract.js": "^7.0.0"
   },
-  "lint-staged": {
-    "*.ts": ["prettier --write", "eslint"],
-    "*.tsx": ["prettier --write", "eslint"]
-  },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/node": "^25.0.9",
