@@ -101,7 +101,10 @@ function getInitialState() {
   if (isRunning && stored.savedAt) {
     const elapsedSeconds = Math.floor((Date.now() - stored.savedAt) / 1000);
 
-    timers = { ...timers, [activeMode]: Math.max(0, timers[activeMode] - elapsedSeconds) };
+    timers = {
+      ...timers,
+      [activeMode]: Math.max(0, timers[activeMode] - elapsedSeconds),
+    };
 
     if (timers[activeMode] === 0) {
       isRunning = false;
@@ -142,7 +145,9 @@ function usePomodoroTimer() {
 
   const [config, setConfig] = useState<TimerConfig>(initialState.config);
   const [isRunning, setIsRunning] = useState(initialState.isRunning);
-  const [activeMode, setActiveMode] = useState<TimerMode>(initialState.activeMode);
+  const [activeMode, setActiveMode] = useState<TimerMode>(
+    initialState.activeMode
+  );
   const [viewMode, setViewMode] = useState<TimerMode>(initialState.viewMode);
   const [timers, setTimers] = useState<Timers>(initialState.timers);
 
@@ -201,9 +206,10 @@ function usePomodoroTimer() {
         const newCompletedSessions = completedSessions + 1;
         setCompletedSessions(newCompletedSessions);
 
-        const nextMode = newCompletedSessions % config.sessionsBeforeLongBreak === 0
-          ? 'longBreak'
-          : 'shortBreak';
+        const nextMode =
+          newCompletedSessions % config.sessionsBeforeLongBreak === 0
+            ? 'longBreak'
+            : 'shortBreak';
         setActiveMode(nextMode);
         setViewMode(nextMode);
       } else {
@@ -211,7 +217,12 @@ function usePomodoroTimer() {
         setViewMode('work');
       }
     };
-  }, [activeMode, completedSessions, config.sessionsBeforeLongBreak, resetModeTimer]);
+  }, [
+    activeMode,
+    completedSessions,
+    config.sessionsBeforeLongBreak,
+    resetModeTimer,
+  ]);
 
   useEffect(() => {
     if (isRunning) {
@@ -257,29 +268,26 @@ function usePomodoroTimer() {
     localStorage.removeItem(STORAGE_KEY);
   }, [config]);
 
-  const updateConfig = useCallback(
-    (key: keyof TimerConfig, value: number) => {
-      setConfig((prev) => {
-        const newConfig = { ...prev, [key]: value };
+  const updateConfig = useCallback((key: keyof TimerConfig, value: number) => {
+    setConfig((prev) => {
+      const newConfig = { ...prev, [key]: value };
 
-        setTimers((prevTimers) => {
-          const updated = { ...prevTimers };
-          const modes: TimerMode[] = ['work', 'shortBreak', 'longBreak'];
+      setTimers((prevTimers) => {
+        const updated = { ...prevTimers };
+        const modes: TimerMode[] = ['work', 'shortBreak', 'longBreak'];
 
-          for (const m of modes) {
-            if (m in newConfig && prevTimers[m] === prev[m] * 60) {
-              updated[m] = (newConfig[m] as number) * 60;
-            }
+        for (const m of modes) {
+          if (m in newConfig && prevTimers[m] === prev[m] * 60) {
+            updated[m] = (newConfig[m] as number) * 60;
           }
+        }
 
-          return updated;
-        });
-
-        return newConfig;
+        return updated;
       });
-    },
-    []
-  );
+
+      return newConfig;
+    });
+  }, []);
 
   return {
     activeMode,
@@ -326,7 +334,11 @@ export function PomodoroTool() {
               key={m}
               onClick={() => switchView(m)}
               variant={viewMode === m ? 'default' : 'secondary'}
-              className={isRunning && activeMode === m && viewMode !== m ? 'animate-pulse' : ''}
+              className={
+                isRunning && activeMode === m && viewMode !== m
+                  ? 'animate-pulse'
+                  : ''
+              }
             >
               {MODE_LABELS[m]}
             </Button>
@@ -379,7 +391,9 @@ export function PomodoroTool() {
             onClick={toggle}
             size='lg'
             className={`rounded-full px-8 ${
-              isRunning && isActiveView ? 'bg-orange-500 hover:bg-orange-600' : ''
+              isRunning && isActiveView
+                ? 'bg-orange-500 hover:bg-orange-600'
+                : ''
             }`}
           >
             {isRunning && isActiveView ? 'Pause' : 'Start'}
