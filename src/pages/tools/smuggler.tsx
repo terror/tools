@@ -108,7 +108,7 @@ function CopyButton({ text, label }: { text: string; label?: string }) {
   );
 }
 
-export function EmojiSmugglerTool() {
+export function SmugglerTool() {
   const [mode, setMode] = useState<'encode' | 'decode'>('encode');
   const [baseEmoji, setBaseEmoji] = useState('😊');
   const [secretMessage, setSecretMessage] = useState('');
@@ -125,7 +125,7 @@ export function EmojiSmugglerTool() {
   }, [encodedInput]);
 
   return (
-    <Tool toolId='emoji-smuggler'>
+    <Tool toolId='smuggler'>
       <div className='space-y-6'>
         <div className='flex gap-2'>
           <Button

@@ -169,7 +169,7 @@ function PropertyInput({
   );
 }
 
-export function FlexboxPlaygroundTool() {
+export function FlexboxTool() {
   const [container, setContainer] = useState<ContainerProps>(DEFAULT_CONTAINER);
   const [items, setItems] = useState<ItemProps[]>([
     createItem(1),
@@ -272,7 +272,7 @@ export function FlexboxPlaygroundTool() {
   }, [generatedCSS]);
 
   return (
-    <Tool toolId='flexbox-playground'>
+    <Tool toolId='flexbox'>
       <div className='space-y-6'>
         {/* Controls */}
         <div className='grid gap-6 lg:grid-cols-2'>

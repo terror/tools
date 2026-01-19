@@ -103,13 +103,13 @@ function StatCard({
   );
 }
 
-export function WordCounterTool() {
+export function CounterTool() {
   const [text, setText] = useState('');
 
   const stats = useMemo(() => calculateStats(text), [text]);
 
   return (
-    <Tool toolId='word-counter'>
+    <Tool toolId='counter'>
       <div className='space-y-6'>
         <div>
           <Textarea
