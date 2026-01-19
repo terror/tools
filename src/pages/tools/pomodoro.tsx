@@ -69,7 +69,9 @@ function loadStoredState(): Partial<StoredState> | null {
     if (stored) {
       return JSON.parse(stored);
     }
-  } catch {}
+  } catch {
+    // ignore
+  }
 
   return null;
 }
