@@ -1,13 +1,13 @@
 import { Layout } from '@/components/layout';
 import { Home } from '@/pages/home';
+import { CounterTool } from '@/pages/tools/counter';
 import { DiffsTool } from '@/pages/tools/diffs';
-import { SmugglerTool } from '@/pages/tools/smuggler';
 import { FlexboxTool } from '@/pages/tools/flexbox';
 import { MathTool } from '@/pages/tools/math';
 import { OcrTool } from '@/pages/tools/ocr';
 import { PomodoroTool } from '@/pages/tools/pomodoro';
 import { ReadabilityTool } from '@/pages/tools/readability';
-import { CounterTool } from '@/pages/tools/counter';
+import { SmugglerTool } from '@/pages/tools/smuggler';
 import {
   createRootRoute,
   createRoute,
