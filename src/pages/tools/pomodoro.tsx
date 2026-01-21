@@ -9,7 +9,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { usePersistedState } from '@/hooks';
+import { usePersistedState } from '@/hooks/use-persisted-state';
 import { Settings } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 

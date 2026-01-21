@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
-import { usePersistedState } from '@/hooks';
+import { usePersistedState } from '@/hooks/use-persisted-state';
 import { useTheme } from '@/providers/theme-provider';
 import { type FileDiffMetadata, parsePatchFiles } from '@pierre/diffs';
 import { FileDiff } from '@pierre/diffs/react';
