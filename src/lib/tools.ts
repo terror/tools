@@ -67,4 +67,12 @@ export const tools: Tool[] = [
     path: '/tools/flexbox',
     createdAt: '2026-01-17',
   },
+  {
+    id: 'password',
+    name: 'Password Generator',
+    description:
+      'Generate strong, random passwords with customizable length and character options.',
+    path: '/tools/password',
+    createdAt: '2026-02-19',
+  },
 ];
