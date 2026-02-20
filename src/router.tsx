@@ -5,6 +5,7 @@ import { DiffsTool } from '@/pages/tools/diffs';
 import { FlexboxTool } from '@/pages/tools/flexbox';
 import { MathTool } from '@/pages/tools/math';
 import { OcrTool } from '@/pages/tools/ocr';
+import { PasswordTool } from '@/pages/tools/password';
 import { PomodoroTool } from '@/pages/tools/pomodoro';
 import { ReadabilityTool } from '@/pages/tools/readability';
 import { SmugglerTool } from '@/pages/tools/smuggler';
@@ -72,6 +73,12 @@ const flexboxRoute = createRoute({
   component: FlexboxTool,
 });
 
+const passwordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/tools/password',
+  component: PasswordTool,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   readabilityRoute,
@@ -82,6 +89,7 @@ const routeTree = rootRoute.addChildren([
   smugglerRoute,
   ocrRoute,
   flexboxRoute,
+  passwordRoute,
 ]);
 
 export const router = createRouter({ routeTree });
